@@ -1,0 +1,153 @@
+
+
+
+body {
+  font-family: Arial, sans-serif, serif;
+  padding: 0px 14px 0px;
+  max-width: 670px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid black;
+  padding: 5px;
+}
+
+#gridbox1 {
+  display: grid;
+  grid-auto-flow: column;
+  max-width: 635px;
+  
+  flex-direction: row;
+  border-left: 5px solid rgb(74, 82, 89); 
+  gap: 0px;
+}
+
+#gridbox > div {
+  display: grid;
+}
+
+#gridbox1 .cell.label{
+  text-align: right;
+}
+
+/* gridboxの背景色 */
+#gridbox1{
+  background-color: #ffcece;
+}
+#gridbox1 .cell {
+  background-color: #ffffffa0;
+}
+#gridbox1 .cell.opt {
+  background-color: #ffffff60;
+}
+#gridbox1 .cell.top {
+  background: linear-gradient(to top, #ffffffa0, #ffffffc0);
+}
+#gridbox1 .cell.bottom {
+  background: linear-gradient(to bottom, #ffffffa0, #ffffffc0);
+}
+#gridbox1 .cell.opt.top {
+  background: linear-gradient(to top, #ffffff60, #ffffff80);
+}
+#gridbox1 .cell.opt.bottom {
+  background: linear-gradient(to bottom, #ffffff60, #ffffff80);
+}
+
+/* gridboxのpaddingレイアウト */
+#gridbox1 .cell {
+  height: 31.5px;
+}
+#gridbox1 .cell.top
+, #gridbox1 .cell.bottom{
+  padding: 0px;
+  height: 10px;
+}
+#gridbox1 .cell.label{
+  padding-left: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+#gridbox1 .cell.input.opt{
+  padding-right: 10px;
+}
+
+
+
+.input-status {
+  width: 40px;
+}
+.no-spin {
+  margin: 0;
+  -moz-appearance:textfield;
+}
+
+.input-status{
+  background-color: white; 
+  border:solid 1px gray;
+  border-radius: 5px;
+}
+
+select.input-status {
+  -webkit-appearance: none;
+  appearance: none;
+}
+select.input-status::-ms-expand {
+  display: none;
+}
+
+
+#flexbox2 {
+  display: flex;
+}
+
+#consolediv {
+  height: 400px;
+  width: 400px;
+  border: 2px solid;
+  border-radius: 8px;
+  margin: 5px 5px 0px 0px;
+  padding: 5px;
+  word-break: break-all;
+  overflow: auto;
+  scroll-behavior: smooth;
+  background-color: white;
+}
+#consolediv>p {
+  background-color: #fff4f4;
+  font-size: 12px;
+  color: black;
+}
+#consolediv>p.tips {
+  color: green;
+}
+#consolediv>p.error {
+  color: red;
+}
+
+
+#tablediv {
+  margin-top: 5px;
+}
+#tablediv>table {
+  min-width: 220px;
+}
+#tablediv .coltitle {
+  background-color: #d9d9d9;
+  font-size: 14px;
+}
+#tablediv .openerrow {
+  background-color: #efefef;
+  font-size: 14px;
+}
+#tablediv .hiderow {
+  background-color: #fafafa;
+  font-size: 14px;
+}
+#tablediv span.decimal {
+  font-size: 12px;
+  color: darkred;
+}
