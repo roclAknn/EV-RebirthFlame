@@ -180,7 +180,7 @@ function createTable(list) {
   let table = document.createElement("table");
   let tr = table.insertRow(0);
   tr.classList.add("coltitle");
-  tr.innerHTML = "<td>Score</td><td>Expected number of attempts (RebirthFlames)</td>";
+  tr.innerHTML = "<td>Score</td><td>転生の炎平均消費数[個(回)]</td>";
   tr.onclick = function(len){
     /* 見出しクリックで全て開く(閉じる) */
     let mode = -1;
