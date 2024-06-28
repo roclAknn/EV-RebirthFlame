@@ -238,6 +238,7 @@ function rowshowhide(n, mode=0){ /*mode=0:自動 1:開く -1:閉じる*/
 *   0: lv, 1: status1, 2: status2, 3: ama, 4: all%, 5: hpmp
 * , 6: spd, 7: jump, 8: declv, 9: def
 */
+
 const tenseidata = [
 [  0, 1,1,1,1,  3,1,1,5, 1],
 [ 10, 1,1,1,1, 30,1,1,5, 1],
@@ -260,6 +261,11 @@ const tenseidata = [
 [250,12,7,1,1,700,1,1,5,12]
 ];
 
+/*
+* 参考ページ
+* https://maplestory.nexon.com/Guide/OtherProbability/game/gameAddOption (2024-06-29)
+* 
+*/
 const 列数抽選率リスト = {
   転生の炎: [0, 40, 40, 16, 4]
 , 製作職人: [0, 21, 50, 25, 4]
@@ -268,7 +274,11 @@ const 列数抽選率リスト = {
 };
 
 const 転生確率 = {
-  転生永遠:{
+  転生深淵:{
+    trate: [ 0,  0,  0, 63, 34,  3]
+  , nrate: 列数抽選率リスト.転生の炎
+  }
+, 転生永遠:{
     trate: [ 0,  0, 29, 45, 25,  1]
   , nrate: 列数抽選率リスト.転生の炎
   }

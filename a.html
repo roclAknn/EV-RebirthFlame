@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>/MapleStory/ 転生の炎の確率計算器</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover" />
+    <meta name="google-site-verification" content="vkAHjrHWlxI9ch267E96FHR8p9ajVqys8hCnFSBES8A" />
+    <meta name="description" content="メイプルストーリーで良い転生スコアを引くのに転生の炎がいくつ必要か計算するツール" />
+    <link rel="stylesheet" href="a.css">
+    <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.1.2/bignumber.min.js'></script>
+    <script src="a.js"></script>
+  </head>
+  <body onload="initialize()">
+    <header>
+      <h3>/MapleStory/ 転生の炎の確率計算器</h3>
+      <h4><a target="_blank" href="https://github.com/roclAknn/EV-RebirthFlame">GitHub</a></h4>
+    </header>
+    
+    <main>
+      <form id="form-status">
+      <div id="gridbox1" style="grid-template-rows: auto repeat(7, 1fr) auto; grid-template-columns: auto 1fr auto 1fr auto auto;">
+        <div class="cell label top"></div>
+        <div class="cell label"><label for="input-str">STR:</label></div>
+        <div class="cell label"><label for="input-dex">DEX:</label></div>
+        <div class="cell label"><label for="input-int">INT:</label></div>
+        <div class="cell label"><label for="input-luk">LUK:</label></div>
+        <div class="cell label"><label for="input-atk">ATK:</label></div>
+        <div class="cell label"><label for="input-ma">MA:</label></div>
+        <div class="cell label"><label for="input-all">All%:</label></div>
+        <div class="cell label bottom"></div>
+        
+        <div class="cell inputl top"></div>
+        <div class="cell input"><input  id="input-str" name="str" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-dex" name="dex" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-int" name="int" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-luk" name="luk" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-atk" name="atk" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-ma"  name="ma"  type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-all" name="all" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input bottom"></div>
+        
+        <div class="cell label top"></div>
+        <div class="cell label"><label for="input-hp">HP:</label></div>
+        <div class="cell label"><label for="input-mp">MP:</label></div>
+        <div class="cell label"><label for="input-spd">移動速度:</label></div>
+        <div class="cell label"><label for="input-jump">ジャンプ:</label></div>
+        <div class="cell label"><label for="input-declv">装着Lv減少:</label></div>
+        <div class="cell label"><label for="input-def">防御力:</label></div>
+        <div class="cell label"></div>
+        <div class="cell label bottom"></div>
+        
+        <div class="cell input top"></div>
+        <div class="cell input"><input  id="input-hp" name="hp" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-mp" name="mp" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-spd" name="spd" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-jump" name="jump" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-declv" name="declv" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"><input  id="input-def" name="def" type="number" class="input-status no-spin" step="any"></div>
+        <div class="cell input"></div>
+        <div class="cell input bottom"></div>
+        
+        <div class="cell label opt top"></div>
+        <div class="cell label opt"><label for="input-lv">装備Lv:</label></div>
+        <div class="cell label opt"><label for="input-add">等級+2:</label></div>
+        <div class="cell label opt"><label for="input-nline">付与数4種:</label></div>
+        <div class="cell label opt"><label for="input-rtype">獲得方法:</label></div>
+        <div class="cell label opt"><label for="input-min">出力最低値:</label></div>
+        <div class="cell label opt"><label for="input-gosa">誤差軽減:</label></div>
+        <div class="cell label opt"><button class="button" type="button" ontouchstart="onbuttondown.call(this, arguments[0].type, ondo);" onmousedown="onbuttondown.call(this, arguments[0].type, initializeform); return false;" style="height: 100%; width: 100%; max-width: 80px;">復元</button></div>
+        <div class="cell label opt bottom"></div>
+        
+        <div class="cell input opt top"></div>
+        <div class="cell input opt"><input  id="input-lv" name="lv" type="number" class="input-status no-spin" step="1"></div>
+        <div class="cell input opt"><input  id="input-add" name="add" type="checkbox" class="input-status no-spin" checked></div>
+        <div class="cell input opt"><input  id="input-nline" name="nline" type="checkbox" class="input-status no-spin" checked></div>
+        <div class="cell input opt"><select id="input-rtype" name="rtype" style="width: 8em;" class="input-status no-spin">
+          <optgroup label="転生の炎">
+            <option value="転生深淵" label="転生:深淵(未実装)">
+            <option value="転生永遠" label="転生:永遠/黒い" selected>
+            <option value="転生強力" label="転生:強力">
+            <option value="転生一般" label="転生:Lv.1XX">
+          </optgroup>
+          <optgroup label="合成">
+            <option value="合成名匠" label="合成:名匠">
+            <option value="合成職人" label="合成:職人">
+            <option value="合成一般" label="合成:～Lv10" style="display: none;">
+          </optgroup>
+          <optgroup label="製作">
+            <option value="製作名匠" label="製作:名匠">
+            <option value="製作職人" label="製作:職人">
+            <option value="製作一般" label="製作:～Lv.10" style="display: none;">
+          </optgroup>
+          <optgroup label="その他">
+            <option value="ドロップ" label="ドロップ">
+            <option value="欠片交換" label="欠片交換">
+            <option value="チャンスタイム" label="チャンスタイム" style="display: none;">
+            <option value="その他"   label="その他">
+          </optgroup>
+        </select></div>
+        <div class="cell input opt"><input  id="input-min" name="min" type="number" class="input-status no-spin" step="1"></div>
+        <div class="cell input opt"><input  id="input-gosa" name="gosa" type="checkbox" class="input-status no-spin"></div>
+        <div class="cell input opt"><button class="button" type="button" ontouchstart="onbuttondown.call(this, arguments[0].type, ondo);" onmousedown="onbuttondown.call(this, arguments[0].type, ondo);" style="height: 100%; width: 100%; max-width: 80px;">生成</button></div>
+        <div class="cell input opt bottom"></div>
+      </div>
+      </form>
+      <div id="flexbox2">
+        <div id="consolediv">
+          <noscript>
+            <p>JavaScriptが無効になっています</p>
+          </noscript>
+        </div>
+        <div id="tablediv"></div>
+      </div>
+      
+    </main>
+  
+
+    <footer>
+      <!-- フッターの内容 -->
+    </footer>
+    
+  </body>
+</html>
