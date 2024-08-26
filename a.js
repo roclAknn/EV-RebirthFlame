@@ -209,7 +209,7 @@ function createTable(list) {
     let ratedecimal = list[k] - rateint;
     rateint = "" + rateint + (ratedecimal > 0 ? "." : "");
     ratedecimal = ("" + ratedecimal).split(".")[1] || "";
-    console.log([list[k], rateint, ratedecimal]);
+    //console.log([list[k], rateint, ratedecimal]);
     row.innerHTML = `<td>${k}</td><td><span class="int">${rateint}</span><span class="decimal">${ratedecimal}</span></td>`;
   }
   let tdiv = document.getElementById("tablediv");
