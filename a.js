@@ -278,6 +278,9 @@ function deleteCookiesAll(){
 /*---- 出力ボタンが押されたときの処理 -----------------------------------*/
 window.toomuch = false; //true:出力中
 function onclickoutputbutton(e){
+alert("output start " + toomuch);
+console.log(1);
+alert(1);
   if( toomuch ) return;
   toomuch = true;
   let isarmor = 0;     // 0:武器 1:防具
@@ -320,6 +323,7 @@ console.error("スコアが全て0");
   // cookieに保存
   setcookieform();
   
+alert("getEV start ");
   let list = getEV();
   let table = createTable(list);
   let title = createTitleElem();
@@ -537,7 +541,6 @@ console.log("proc end");
   
   /* スコアごと確率を計算しリストを作成 */
   function getEV(){
-alert("getEV start");
 let starttime = new Date();
 let calccount1 = [,0,0,0,0];
 let calccount2 = [,0,0,0,0];
