@@ -77,11 +77,11 @@ header {
   align-items: center;
 }
 .frame.label{
-  justify-content: end;
+  justify-content: flex-end;
   padding-right: 5px;
 }
 .frame.input{
-  justify-content: start;
+  justify-content: flex-start;
   padding-right: 5px;
 }
 
