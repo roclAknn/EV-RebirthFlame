@@ -296,9 +296,10 @@
           /* exportbuttonの処理 */
           const exportbutton = document.getElementById("exportbutton");
           exportbutton.onclick = function(){
-alert(1);
+try{
             onclickoutputbutton();
-          }
+}catch(e){alert(e.message);}
+          };
           
           /* exporttypeの処理 */
           const exporttypediv = document.getElementById("exporttypediv");
