@@ -537,6 +537,7 @@ console.log("proc end");
   
   /* スコアごと確率を計算しリストを作成 */
   function getEV(){
+alert("getEV start");
 let starttime = new Date();
 let calccount1 = [,0,0,0,0];
 let calccount2 = [,0,0,0,0];
