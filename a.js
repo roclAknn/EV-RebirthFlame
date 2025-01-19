@@ -277,10 +277,10 @@ function deleteCookiesAll(){
 }
 
 /*---- 出力ボタンが押されたときの処理 -----------------------------------*/
-let toomuch = false; //true:出力中
+window.toomuch = false; //true:出力中
 function onclickoutputbutton(e){
-  if( toomuch ) return;
-  toomuch = true;
+  if( window.toomuch ) return;
+  window.toomuch = true;
   let isarmor = 0;     // 0:武器 1:防具
   let eqplv = 0;       // 装備レベル
   let origineqplv = 0; // 入力された装備レベル（表示用）
@@ -333,7 +333,7 @@ console.error("スコアが全て0");
   //-----------------------------------------------------------------------
   /* 関数終了時処理（中断含む） */
   function finalize(){
-    toomuch = false;
+    window.toomuch = false;
 console.log("proc end");
     return;
   }
@@ -352,7 +352,7 @@ console.log("proc end");
         break;
       case "select-one":
         v = e.value;
-        break
+        break;
       default:;
     }
     return v;
