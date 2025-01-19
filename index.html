@@ -267,7 +267,7 @@
       </div>
       
       <div>
-        <div id="exportbutton" onclick="onclickoutputbutton()">出力</div>
+        <div id="exportbutton">出力</div>
       </div>
       
       <div id="exporttypediv" style="align-content: center;">
@@ -292,6 +292,12 @@
             let isclose = headerdiv.classList.toggle("close");
             openerdiv.classList.toggle("active", isclose);
           };
+          
+          /* exportbuttonの処理 */
+          const exportbutton = document.getElementById("exportbutton");
+          exportbutton.onclick = function(){
+            onclickoutputbutton();
+          }
           
           /* exporttypeの処理 */
           const exporttypediv = document.getElementById("exporttypediv");
@@ -386,7 +392,6 @@
       title.appendChild(titleelem);
     }
     addPanedata(panedata);
-    doneAddPane = true;
   }
 
   async function addPanedata(panedata) {
@@ -449,6 +454,7 @@
     await waitForTransition(pane);
     pane.style.height = "fit-content"; //表示が終わったあとの変化はアニメーションさせない
     fixPanesdivHeight();
+    doneAddPane = true;
   }
   
   function createPane() {
