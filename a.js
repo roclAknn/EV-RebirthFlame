@@ -1,5 +1,5 @@
-
-window.toomuch = false; //true:出力中
+alert(111);
+let toomuch = false; //true:出力中
 const 転生基準値リスト = [];
 
 
