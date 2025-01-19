@@ -1,4 +1,3 @@
-try{
 
 const 転生基準値リスト = [];
 
@@ -177,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initialize();
 });
 
-}catch(e){alert(e.message)}////////////////////////////////////////////////////////////////
 
 function initialize(){
   initializewithcookies();
@@ -281,6 +279,9 @@ function deleteCookiesAll(){
 /*---- 出力ボタンが押されたときの処理 -----------------------------------*/
 window.toomuch = false; //true:出力中
 function onclickoutputbutton(e){
+alert(コモンフォーム名リスト);
+alert(formnames);
+alert(window.toomuch);
   if( toomuch ) return;
   toomuch = true;
   let isarmor = 0;     // 0:武器 1:防具
