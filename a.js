@@ -1,4 +1,4 @@
-
+try{
 
 const 転生基準値リスト = [];
 
@@ -176,6 +176,9 @@ const combinations = [
 document.addEventListener("DOMContentLoaded", () => {
   initialize();
 });
+
+}catch(e){alert(e.message)}////////////////////////////////////////////////////////////////
+
 function initialize(){
   initializewithcookies();
 }
