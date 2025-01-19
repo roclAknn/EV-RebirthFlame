@@ -1,153 +1,492 @@
 
 
-
 body {
   font-family: Arial, sans-serif, serif;
-  padding: 0px 14px 0px;
-  max-width: 670px;
+  margin: 10px;
+  background: #f0f0f0;
+  color: #333;
+  width: fit-content;
 }
 
-table {
-  border-collapse: collapse;
+header {
+  display: flex;
+  justify-content: space-between;
 }
 
-td, th {
-  border: 1px solid black;
-  padding: 5px;
+/*----全体フレーム-------------------------------------------------*/
+#main{
+  background: #fff6f0;
 }
 
-#gridbox1 {
+/*----上フレーム---------------------------------------------------*/
+
+#headerdiv {
+  width: 542px;
+  height: 240px;
+  display: flex;
+  transition: 0.2s linear;
+  overflow: hidden;
+  border: 2px solid black;
+  border-radius: 10px 10px 0 0;
+}
+
+#headerdiv.close {
+  height: 0px;
+}
+
+/* 各列のスタイル */
+.column {
+  height: 240px; /* divを閉じる際に潰れないために必要 */
+}
+
+
+/* A列: 1x7分割 */
+.column.a {
+  width: 240px;
   display: grid;
-  grid-auto-flow: column;
-  max-width: 635px;
-  
-  flex-direction: row;
-  border-left: 5px solid rgb(74, 82, 89); 
-  gap: 0px;
+  grid-template-columns: 1fr 1fr; /* 横に2列 */ 
+  grid-template-rows: repeat(7, 1fr); /* 縦に7行 */
+  border: 2px solid black;
+  border-radius: 10px 10px 10px 0;
+  margin: -2px 0px -2px -2px; /* 枠線を重ねる */
+  background: #ffe0ee;
+}
+.column.a .label {
+  font-weight: bold;
 }
 
-#gridbox > div {
+/* B列, C列: 2x7分割 */
+.column.b,
+.column.c {
+  width: 150px;
   display: grid;
+  grid-template-columns: 1fr 55px; /* 横に2列 */
+  grid-template-rows: repeat(7, 1fr); /* 縦に7行 */
+  background: #fffae0;
+}*
+
+/* 結合フレームのスタイル */
+.frame.join {
+  grid-column: span 2; /* 横2列分結合 */
 }
 
-#gridbox1 .cell.label{
-  text-align: right;
+/* フレームセルのスタイル */
+.frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.frame.label{
+  justify-content: end;
+  padding-right: 5px;
+}
+.frame.input{
+  justify-content: start;
+  padding-right: 5px;
 }
 
-/* gridboxの背景色 */
-#gridbox1{
-  background-color: #ffcece;
+/* 非表示フレームのスタイル */
+.hiddenisarmor{
+  display: none !important;
 }
-#gridbox1 .cell {
-  background-color: #ffffffa0;
-}
-#gridbox1 .cell.opt {
-  background-color: #ffffff60;
-}
-#gridbox1 .cell.top {
-  background: linear-gradient(to top, #ffffffa0, #ffffffc0);
-}
-#gridbox1 .cell.bottom {
-  background: linear-gradient(to bottom, #ffffffa0, #ffffffc0);
-}
-#gridbox1 .cell.opt.top {
-  background: linear-gradient(to top, #ffffff60, #ffffff80);
-}
-#gridbox1 .cell.opt.bottom {
-  background: linear-gradient(to bottom, #ffffff60, #ffffff80);
+.hiddenissimpleatk{
+  display: none !important;
 }
 
-/* gridboxのpaddingレイアウト */
-#gridbox1 .cell {
-  height: 31.5px;
-}
-#gridbox1 .cell.top
-, #gridbox1 .cell.bottom{
-  padding: 0px;
-  height: 10px;
-}
-#gridbox1 .cell.label{
-  padding-left: 15px;
-  white-space: nowrap;
+/*---- 武器防具スイッチ ------------------------------------------*/
+.switch {
+  position: relative;
+  width: 90%;
+  height: 90%;
+  background: #ddd;
+  border-radius: 10px;
+  cursor: pointer;
   overflow: hidden;
 }
-#gridbox1 .cell.input.opt{
-  padding-right: 10px;
+
+.knob {
+  position: absolute;
+  top:0%;
+  left:0%;
+  width: 53%;
+  height: 100%;
+  border-radius: inherit;
+  background: lightsalmon;
+  transition: 0.5s ease-in-out;
+}
+
+.switch.active .knob {
+  left: 47%;
+  background: lightblue;
+}
+
+.switch::before, .switch::after {
+  z-index: 100;
+  font-size: 15px;
+  font-weight: bold;
+  position: absolute;
+  transition: 0.3s linear;
+}
+
+.switch::before {
+  content: '武器';
+  top: 50%;
+  left: 25%;
+}
+
+.switch::after {
+  content: '防具';
+  top: 50%;
+  left: 75%;
+}
+
+.switch:not(.active)::before {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+.switch.active::before {
+  transform: translate(-50%, -50%) scale(1.0);
+}
+
+.switch:not(.active)::after {
+  transform: translate(-50%, -50%) scale(1.0);
+}
+.switch.active::after {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+/*---- divONFOFFボタン ------------------------------------------- */
+.divbutton {
+  width: 70%;
+  height: 80%;
+  border: 2px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.divbutton::before {
+  content: '';
+  font-size: 14px;
+  color: #bbb;
+  font-weight: bold;
+  position: absolute;
+  inset: 2px;
+  border-radius: 3px;
+  pointer-events: none;
+  text-align: center;
+  align-content: center;
+}
+
+/* ONの状態 */
+.divbutton.active {
+  border-color: #555;
+}
+
+.divbutton.active::before {
+  border: 1px solid #555;
+  color: #555;
+}
+
+/*---- 出力ボタン等フレーム ---------------------------------------------*/
+
+#exportbuttondiv{
+  height: 40px;
+  width: 542px;
+  border: solid;
+  border-width: 0px 2px 2px;
+  align-content: center;
+  display: grid;
+  grid-template-columns: 50px 1fr auto auto;
+}
+
+/* 上フレーム開閉ボタン */
+#exportbuttondiv #openerdiv{
+  margin-left: 5px;
+  width: 30px;
+  height: 30px;
+}
+#exportbuttondiv #openerdiv .arrowdiv{
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  border-color: black black transparent transparent;
+  border-style: solid;
+  border-width: 3px;
+  border-radius: 15%;
+  top: calc(50% - (21px*0.27));
+  left: calc(50% - (21px*0.73));
+  transform-origin: calc(21px*0.73) calc(21px*0.27);
+  transform: rotate(-45deg);
+  transition: 0.3s linear;
+}
+#exportbuttondiv #openerdiv.active .arrowdiv{
+  transform: rotate(135deg) !important;
+}
+
+/* 出力ボタン 吹き出し型 */
+#exportbutton {
+  position: relative;
+  width: 80px;
+  height: 30px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  background-color: #f66;
+  border: #fbb solid 2px;
+  border-radius: 5px;
+  text-align: center;
+  align-content: center;
+}
+#exportbutton:after{
+  border-top: 15px solid #f66;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  bottom: -8px;
+  left: 25px;
+  content: "";
+  position: absolute;
+}
+
+/* 出力期待値・確率切り替えボタン */
+#exporttypediv{
+  align-content: center;
+  cursor: pointer;
+  background: #f9f9f9;
+  color: #555;
+  font-weight: bold;
+  border: 2px #555 solid;
+  border-radius: 5px;
+  padding: 0px 6px;
 }
 
 
+/*---- 出力結果ペイン ---------------------------------------------*/
+#exportdiv{
+  width: 542px; /* 3 panes * 180px + border*2 */
+  border: solid;
+  border-width: 0px 2px 2px;
+}
 
-.input-status {
-  width: 40px;
+.panesdiv{
+}
+#panestitlediv {
+  position: relative;
+  height: 35px;
+  overflow: visible; /* ペイン追加中のみhiddenにする */
+  z-index: 10000;
+}
+#panestitlediv.overflowhidden {
+  overflow: hidden;
+}
+#panesdiv {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+  transition: height 0.5s ease-in;
+  transition-delay: 0.3s;
+}
+
+.panetitle{
+  width: 180px; /* panewidth */
+  background-color: #f66;
+  color: #fff;
+  border-right: 1px solid #aaa;
+  position: absolute;
+  transition: transform 0.3s linear, height 0.2s linear;
+}
+.pane {
+  width: 180px; /* panewidth */
+  height: 0px;
+  background-color: lightblue;
+  border-right: 1px solid #aaa;
+  position: absolute;
+  transition: transform 0.3s linear, top 0.0s linear, height 0.2s linear;
+  cursor: grab;
+  overflow: hidden;
+}
+.pane:active {
+  cursor: grabbing;
+}
+
+/*---- ペイン内要素 -------------------------------------------------*/
+/* panetitle */
+.panetitleelem{
+  display: flex;
+  height: 35px;
+  align-items: center; /* 縦中央揃え */
+  justify-content: space-between; /* 左右端に配置 */
+  padding: 0px 4px;
+}
+.panetitleelem>*{
+  height: 100%;
+  align-content: center;
+  width: 35px
+}
+.panetitleelem>.eqplvdiv{
+  flex-grow: 1;
+}
+.panetitleelem>.toolsdiv{
+}
+.panetitleelem>.toolsdiv>button{
+  height: 35px;
+}
+.panetitleelem>.iconimg{
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+.iconimg.武器{ background-image: url("./images/武器.png"); }
+.iconimg.防具{ background-image: url("./images/防具.png"); }
+.iconimg.深淵{ background-image: url("./images/深淵.png"); }
+.iconimg.永遠{ background-image: url("./images/永遠.png"); }
+.iconimg.強力{ background-image: url("./images/強力.png"); }
+.iconimg.一般{ background-image: url("./images/一般.png"); }
+.iconimg.合成{ background-image: url("./images/合成.png"); }
+.iconimg.製作{ background-image: url("./images/製作.png"); }
+.iconimg.その他{ background-image: url("./images/その他.png"); }
+
+/* ハンバーガーボタン */
+.hamburger {
+  width: 20px;
+  height: 17px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 6px 4px;
+}
+.hamburger span {
+  display: #555;
+  width: 100%;
+  height: 2px; /* 線の太さ */
+  background-color: black;
+  border-radius: 2px; /* 少し丸める */
+}
+
+/* panetable */
+#panesdiv table {
+  border-spacing: 0;
+  min-width: 180px; /* panewidth */
+  white-space: nowrap;
+}
+#panesdiv tr.coltitle {
+  background-color: #f66;
+  color: white;
+  font-size: 14px;
+}
+#panesdiv tr.openerrow {
+  background: white;
+  font-size: 14px;
+}
+#panesdiv tr.hiderow {
+  background: white;
+  font-size: 14px;
+}
+#panesdiv tr.hiderow>td:first-child{ /* trにつけるとdisplay切り替えでうまく動かない */
+  border-left: 3px solid #f66;
+  
+}
+#panesdiv span.decimal {
+  font-size: 12px;
+  color: darkred;
+}
+#panesdiv td{
+  border-right: 1px solid #999;
+  padding: 2px 4px 2px 4px;
+  height: 25px;
+}
+#panesdiv tr.nth10{
+  background-color: #fff0f0 !important;
+}
+
+
+/*---- input要素共通 ---------------------------------------------------------*/
+.no-spin::-webkit-inner-spin-button,
+.no-spin::-webkit-outer-spin-button {
+  -webkit-appearance: none;
 }
 .no-spin {
   margin: 0;
-  -moz-appearance:textfield;
+  -moz-appearance: textfield;
 }
-
 .input-status{
   background-color: white; 
   border:solid 1px gray;
   border-radius: 5px;
 }
 
+input.input-status {
+  width: 40px;
+  height: 20px;
+  padding: 1px 4px;
+}
+input[type="checkbox"].input-status {
+  width: unset;
+  transform: scale(1.2);
+}
+
 select.input-status {
+  min-width: 40px;
+  max-width: 100px;
   -webkit-appearance: none;
   appearance: none;
+  height: 24px;
+  padding: 1px 4px;
 }
+
 select.input-status::-ms-expand {
   display: none;
 }
 
 
-#flexbox2 {
-  display: flex;
+
+/*-------- 生成プルダウンメニュー共通 ------------------------*/
+.button-dropdown-wrapper {
+  display: inline-block;
 }
 
-#consolediv {
-  height: 400px;
-  width: 400px;
-  border: 2px solid;
-  border-radius: 8px;
-  margin: 5px 5px 0px 0px;
-  padding: 5px;
-  word-break: break-all;
-  overflow: auto;
-  scroll-behavior: smooth;
-  background-color: white;
+.button-dropdown-wrapper>button {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  padding: 1px;
+  font-size: 10px;
+  height: 24px;
+  width: 24px;
+  margin-left: 1px;
 }
-#consolediv>p {
-  background-color: #fff4f4;
-  font-size: 12px;
-  color: black;
+
+.template-dropdown {
+  display: none;
+  position: absolute;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50000;
+  width: auto; /* 項目の文字列幅に基づく最小幅 */
+  white-space: nowrap; /* テキストを1行に収める */
+  color: #333;
+  border-radius: 0px 5px 5px 5px;
 }
-#consolediv>p.tips {
-  color: green;
+
+.template-dropdown ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
-#consolediv>p.error {
-  color: red;
+
+.template-dropdown li {
+  padding: 8px;
+  cursor: pointer;
+  text-align: right;
+}
+
+.template-dropdown li:hover {
+  background-color: #f0f0f0;
 }
 
 
-#tablediv {
-  margin-top: 5px;
-}
-#tablediv>table {
-  min-width: 220px;
-}
-#tablediv .coltitle {
-  background-color: #d9d9d9;
-  font-size: 14px;
-}
-#tablediv .openerrow {
-  background-color: #efefef;
-  font-size: 14px;
-}
-#tablediv .hiderow {
-  background-color: #fafafa;
-  font-size: 14px;
-}
-#tablediv span.decimal {
-  font-size: 12px;
-  color: darkred;
-}
