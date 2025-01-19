@@ -187,12 +187,18 @@
           btnisboss.classList.toggle('active', chkisboss.checked);
           
           btnisboss.onclick = function(){
-            chkisboss.checked = !chkisboss.checked;
+            setIsBoss();
+          };
+          function setIsBoss(isboss=-1){
+            if( isboss == -1 ){
+              //toggle処理
+              chkisboss.checked = !chkisboss.checked;
+              isboss = chkisboss.checked;
+            }
             btnisboss.classList.toggle('active', chkisboss.checked);
             //simpleatkセレクトのオプション配置
             initSimpleAtk(chkisboss.checked);
-          };
-          
+          }
           
           /* issimpleatkボタンの処理 */
           let chkissimpleatk = document.getElementById('input-issimpleatk');

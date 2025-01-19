@@ -209,7 +209,17 @@ function initializewithcookies(){
         break
       default:;
     }
+    
   });
+  
+  // isarmor, isboss, issimpleatkの状態を表示に反映させる
+  let chkisarmor = document.getElementById('input-isarmor');
+  let chkisboss = document.getElementById('input-isboss');
+  let chkissimpleatk = document.getElementById('input-issimpleatk');
+  setIsArmor(chkisarmor.checked);
+  setIsSimpleAtk(chkissimpleatk.checked);
+  setIsBoss(chkisboss.checked); //input-simpleatkの初期化を含むので最後
+  
 }
 
 /*---- cookie処理 -----------------------------------------------*/
