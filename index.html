@@ -297,12 +297,7 @@
           const exportbutton = document.getElementById("exportbutton");
           exportbutton.onclick = function(){
 try{
-alert(転生基準値リスト);
-alert(列数抽選率リスト);
-alert(転生確率);
-alert(コモンフォーム名リスト);
-alert(スコアフォーム名リスト);
-alert(new Set([1,2,3,4,5]));
+alert( new Set(コモンフォーム名リスト).union( new Set(スコアフォーム名リスト[0]) ).union( new Set(スコアフォーム名リスト[1]) ) );
 alert(formnames);
             onclickoutputbutton();
 }catch(e){alert(e.message);}
