@@ -296,12 +296,7 @@
           /* exportbuttonの処理 */
           const exportbutton = document.getElementById("exportbutton");
           exportbutton.onclick = function(){
-try{
-alert(Set.prototype);
-alert(Set.prototype.union);
-alert(combinations);
             onclickoutputbutton();
-}catch(e){alert(e.message);}
           };
           
           /* exporttypeの処理 */
@@ -470,23 +465,49 @@ alert(combinations);
     
     // 縦方向にドラッグできるようにする
     const checkbox = document.getElementById("ctrlpanemove"); //機能のONOFF制御を取得 checked:ON
-    pane.onmousedown = (e) => {
+    pane.onmousedown = pane.ontouchstart = startevent; 
+    function startevent(e){
       if( !checkbox.checked ) return;
-      const startY = e.clientY;
+      
+      e.preventDefault();
+      
+      let clientY;
+      if (e.touches && e.touches.length > 0) {
+        clientY = e.touches[0].clientY;
+      }else{
+        clientY = e.clientY;
+      }
+      
+      const startY = clientY;
       const startTop = parseFloat(pane.style.top || '0');
-      function onMouseMove(event) {
-        const newY = event.clientY - startY + startTop;
+      
+      function moveevent(e) {
+        e.preventDefault();
+        let clientY;
+        if (e.touches && e.touches.length > 0) {
+          clientY = e.touches[0].clientY;
+        }else{
+          clientY = e.clientY;
+        }
+        const newY = clientY - startY + startTop;
         pane.style.top = `${ Math.max(0, newY) }px`;
       }
-      function onMouseUp() {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+      function endevent() {
+        e.preventDefault();
+        document.removeEventListener('mousemove', moveevent);
+        document.removeEventListener('mouseup', endevent);
+        document.removeEventListener('touchmove', moveevent);
+        document.removeEventListener('touchend', endevent);
         fixPanesdivHeight();
       }
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', moveevent);
+      document.removeEventListener('mouseup', endevent);
+      document.removeEventListener('touchmove', moveevent);
+      document.removeEventListener('touchend', endevent);
+      document.addEventListener('mousemove', moveevent);
+      document.addEventListener('mouseup', endevent);
+      document.addEventListener('touchmove', moveevent);
+      document.addEventListener('touchend', endevent);
     };
     // ペインの移動機能がONのときは選択禁止にする
     pane.addEventListener('selectstart', (e) => {
