@@ -144,6 +144,17 @@ const スコアフォーム名リスト = [];
 , "hp",  "mp",  "def",  "declv", "spd", "jump"
 ];
 
+// Set.unionがなければ自作する
+if( !Set.prototype.union ){
+  Set.prototype.union = function(other){
+    const result = new Set(this); // 現在の Set をコピー
+    for (const value of other) {
+      result.add(value); // otherSet の要素を追加
+    }
+    return result; // 結果の Set を返す
+  };
+}
+
 /* cookie処理用フォーム名リスト */
 const formnames = new Set(コモンフォーム名リスト).union( new Set(スコアフォーム名リスト[0]) ).union( new Set(スコアフォーム名リスト[1]) );
 
