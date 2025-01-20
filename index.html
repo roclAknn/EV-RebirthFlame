@@ -297,8 +297,7 @@
           const exportbutton = document.getElementById("exportbutton");
           exportbutton.onclick = function(){
 try{
-alert( new Set(コモンフォーム名リスト).union( new Set(スコアフォーム名リスト[0]) ).union( new Set(スコアフォーム名リスト[1]) ) );
-alert(formnames);
+alert(Set.prototype.union);
             onclickoutputbutton();
 }catch(e){alert(e.message);}
           };
