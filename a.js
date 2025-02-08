@@ -555,7 +555,7 @@ let calccount2 = [,0,0,0,0];
     let result = [];
     
     let scdatas = scoredatas;
-    let pweapon = (isarmor && !issimpleatk ? weaponscoredatas[4] : BigNumber(0));
+    let pweapon = (!isarmor && !issimpleatk) ? weaponscoredatas[4] : BigNumber(0);
     
     let tensei = 転生確率[rtype];
     let trate = tensei.trate;
@@ -762,10 +762,6 @@ console.log("リスト作成終了", (new Date() - starttime)/1000);
         }
         row.atkrank = atkrank;
         row.scidx = scidx;
-        let probint = Math.trunc(prob);
-        let probdecimal = prob - probint;
-        probint = "" + probint + ( probdecimal > 0 ? "." : "" );
-        probdecimal = ("" + probdecimal).split(".")[1] || "";
         
         let rank = 0;
         if( atkrank > 0 ) rank = atkrank + (isboss ? 2 : 0);
