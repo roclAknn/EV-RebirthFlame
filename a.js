@@ -289,6 +289,8 @@ function deleteCookiesAll(){
 
 /*---- 出力ボタンが押されたときの処理 -----------------------------------*/
 window.toomuch = false; //true:出力中
+window.isstepexport = 1; // 1:スコアを1刻みで出力(ステップ)　0:存在するスコアのみ出力(インデックス)　-1:次の出力のみステップ
+window.alertexportnum = 5000; // 出力量が多い場合に警告する
 function onclickoutputbutton(e){
   if( window.toomuch ) return;
   window.toomuch = true;
@@ -320,6 +322,7 @@ console.log("proc start");
 console.log("inputcommons", inputcommons);
 console.log("inputscores", inputscores);
 console.log("sorted scoredatas", scoredatas);
+console.log("weapon scoredatas", weaponscoredatas);
   
   
   // エラー判定
@@ -335,6 +338,14 @@ console.error("スコアが全て0");
   let list = getEV();
   let table = createTable(list);
   let title = createTitleElem();
+  
+  
+  // 計算用の定数
+  let num = scoredatas.length + (!isarmor);
+  let div = num*(num-1)*(num-2)*(num-3)*100**5; /* 共通分母 5=転生4列+列数抽選率 */
+  let e50 = new BigNumber( Math.LN2 );
+  let e05 = new BigNumber( Math.LN2 ).plus( Math.LN10 );
+    
   table.setProbs();
   createAndAddPanedata(table, title);
   
@@ -553,6 +564,7 @@ let starttime = new Date();
 let calccount1 = [,0,0,0,0];
 let calccount2 = [,0,0,0,0];
     let result = [];
+    let scresult = [];
     
     let scdatas = scoredatas;
     let pweapon = (!isarmor && !issimpleatk) ? weaponscoredatas[4] : BigNumber(0);
@@ -695,33 +707,67 @@ calccount2[tenseinum]++;
             // 整数スコアごとに確率（この時点では組み合わせ数）を集計する
             // atkidx 武器簡易版はATKRANKごとに分ける。それ以外は0
             let atkidx = n4isatk && issimpleatk ? (r4+1) : 0;
-            let res = result;
-            res = res[ atkidx ] = (res[ atkidx ] || []);
-            res[ score ]  = prob + (res[ score ]  || 0);
+            
+            let scres = scresult[atkidx] || (scresult[atkidx] = new Set());
+            let res   = result[atkidx]   || (result[atkidx] = {});
+            
+            if( scres.has( score ) ){
+              res[ score ] += prob;
+            }else{
+              scres.add( score );
+              res[ score ] = prob;
+            }
           }}}} // r1-r4終了
         }}}} // n1-n4終了
       } // n4isatk終了
     } // tenseinum終了
     
+    scresult.forEach( (scoreset, idx, arr) => {
+      // Set -> Array 昇順ソート
+      arr[idx] = Array.from(scoreset).sort( (a, b) => a-b );
+    });
+    
 console.log("転生走査終了", (new Date() - starttime)/1000, calccount1, calccount2);
-    // 1刻みスコア->確率の分子部分（組み合わせ数）リストへの変換
+    
+    // 確率を累積し、スコアと確率分子部の組のリストを格納した配列を作成
     let prob = 0;
+    let retres = [];
     for(let aidx = result.length-1; 0 <= aidx; aidx--){
       let res1 = result[aidx];
       if( !res1 ) continue;
-      for(let sidx = res1.length-1; 0 <= sidx; sidx--){// スコアは1刻みで出力するため未定義要素も処理する
-        if( sidx == min-1 ){
-          if( isarmor ) break;
-          if( issimpleatk && aidx == simpleatk ) break;
-          if( !issimpleatk ) break;
-        }
-        let res2 = res1[sidx];
-        if( res2 ) prob += res2;
-        res1[sidx] = prob;
+      
+      retres[aidx] = [];
+      let scores = scresult[aidx];
+      for(let sidx = scores.length-1; 0 <= sidx; sidx--){
+        let sc = scores[sidx];
+        prob += res1[sc];
+        retres[aidx].unshift([sc, prob]); // スコア降順で回し、昇順で格納する
       }
     }
+//console.log(retres);
 console.log("リスト作成終了", (new Date() - starttime)/1000);
-    return result;
+
+    // 出力量の計算
+    let stepnum = 0;
+    let idxnum = 0;
+    scresult.forEach((scores, aidx)=>{
+      idxnum += scores.length;
+      stepnum += scores[ scores.length-1 ] - scores[ 0 ];
+    });
+console.log("出力量", idxnum, stepnum);
+    
+    if( isstepexport <= 0 || stepnum > alertexportnum ){
+      if( idxnum > alertexportnum ){
+        if( !window.confirm(`出力量が多すぎます ${idxnum}\nハングする可能性がありますが実行しますか？`) ){
+          return [];
+        };
+      }else if( isstepexport > 0 ){
+        window.alert(`出力量が多いため代表値のみ出力します\n${stepnum}->${idxnum}\nステップ出力するにはスコアを小さくしてください`);
+        isstepexport = -1;
+      }
+    }
+    
+    return retres;
   }
   
   
@@ -732,7 +778,7 @@ console.log("リスト作成終了", (new Date() - starttime)/1000);
     tr.classList.add("coltitle");
     tr.innerHTML = "<td>Score</td><td></td>";
     
-    let trlist = {};
+    let trlist = [];
     
     // listが空の場合の表示用
     if( list.length <= 0 ){
@@ -742,37 +788,73 @@ console.log("リスト作成終了", (new Date() - starttime)/1000);
         rank = simpleatk;
         sc = `R${simpleatk + (isboss ? 2 : 0)}_0`;
       }
-      (list[rank] = [])[min] = 0;
+      (list[rank] = [])[0] = [min, 0];
     }
-    
-    list.forEach((scores, atkrank)=>{
-      trlist[ atkrank ] = [];
-      let scidx = 0;
-      scores.forEach((prob, sc)=>{
-        let row = table.insertRow();
-        if( sc%5 == 0 ){
-          row.classList.add("openerrow");
-          row.onclick = rowshowhide.bind(row, trlist[atkrank], scidx, 0);
-        }else{
-          row.classList.add("hiderow");
-          row.style.display = "none";
+    if( isstepexport > 0 ){
+      list.forEach((scores, atkrank)=>{
+        trlist[ atkrank ] = [];
+        
+        // ここではtrの作成とスコアの入力のみ。期待値は入れない
+        let tridx = 0;
+        let sc = scores[0][0];
+        for( let sidx = 0; sidx < scores.length; sidx++ ){
+          next = scores[sidx+1];
+          next = next ? next[0] : sc + 1;
+          let issidx = true;
+          while( sc < next ){
+            let row = table.insertRow();
+            if( sc%5 == 0 ){
+              row.classList.add("openerrow");
+              row.onclick = rowshowhide.bind(row, trlist[atkrank], tridx, 0);
+            }else{
+              row.classList.add("hiderow");
+              row.style.display = "none";
+            }
+            if( sc%10 <= 4 ){
+              row.classList.add("nth10");
+            }
+            row.atkrank = atkrank;
+            row.tridx = tridx;
+            row.scidx = sidx + (issidx ? 0 : 1);
+            let rank = 0;
+            if( atkrank > 0 ) rank = atkrank + (isboss ? 2 : 0);
+            let scstr = ( !isarmor && issimpleatk ) ? `R${rank}_${sc}` : sc;
+            
+            row.innerHTML = `<td>${scstr}</td><td></td>`; // 期待値入力はあとで
+            trlist[ atkrank ].push(row);
+            issidx = false;
+            tridx++;
+            sc++;
+          }
         }
-        if( sc%10 <= 4 ){
-          row.classList.add("nth10");
-        }
-        row.atkrank = atkrank;
-        row.scidx = scidx;
-        
-        let rank = 0;
-        if( atkrank > 0 ) rank = atkrank + (isboss ? 2 : 0);
-        if( !isarmor && issimpleatk ) sc = `R${rank}_${sc}`;
-        
-        row.innerHTML = `<td>${sc}</td><td></td>`; // 期待値入力はあとで
-        trlist[ atkrank ].push(row);
-        
-        scidx++;
       });
-    });
+    }else{
+      list.forEach((scores, atkrank)=>{
+        trlist[ atkrank ] = [];
+        
+        // ここではtrの作成とスコアの入力のみ。期待値は入れない
+        let tridx = 0;
+        for( let sidx = 0; sidx < scores.length; sidx++ ){
+          let sc = scores[sidx][0];
+          let row = table.insertRow();
+          row.classList.add("openerrow");
+          if( sidx%2 == 0 ){
+            row.classList.add("nth10");
+          }
+          row.atkrank = atkrank;
+          row.tridx = tridx;
+          row.scidx = sidx;
+          let rank = 0;
+          if( atkrank > 0 ) rank = atkrank + (isboss ? 2 : 0);
+          let scstr = ( !isarmor && issimpleatk ) ? `R${rank}_${sc}` : sc;
+            
+          row.innerHTML = `<td>${scstr}</td><td></td>`; // 期待値入力はあとで
+          trlist[ atkrank ].push(row);
+          tridx++;
+        }
+      });
+      if( isstepexport < 0 ) isstepexport = 1;
+    }
     
     //openerrowが一つもない場合はhiderowを表示する
     if( table.getElementsByClassName("openerrow").length < 1 ){
@@ -792,19 +874,20 @@ console.log("リスト作成終了", (new Date() - starttime)/1000);
       if( mode <= 0 ) mode = -1;
       const rows = table.getElementsByClassName("openerrow");
       Array.from(rows).forEach(row=>{
-        rowshowhide(table.trlist[row.atkrank], row.scidx, mode);
+        rowshowhide(table.trlist[row.atkrank], row.tridx, mode);
       });
     }
     function rowshowhide(list, idx, mode=0){ /*mode=0:自動 1:開く -1:閉じる*/
+      if( !list[idx].onclick ) return;
       for(var i = 1; i <= 4; i++){
         let n = idx+i;
-        if(n < list.length){
+        if( n < list.length ){
           let st = list[n].style;
           st.display = mode == 0 ? (st.display == "none" ? "" : "none") : (mode > 0 ? "" : "none");
         }
         /* 最上段のopenerの場合は上方のhiderowも切り替える */
         n = idx-i;
-        if(idx <= 4 && 0 <= n){
+        if( idx <= 4 && 0 <= n ){
           let st = list[n].style;
           st.display = mode == 0 ? (st.display == "none" ? "" : "none") : (mode > 0 ? "" : "none");
         }
@@ -814,6 +897,7 @@ console.log("リスト作成終了", (new Date() - starttime)/1000);
     }
   }
   
+  /* テーブルに確率をまとめて入れる */
   function setProbs(){
     const list = table.data;
     const trlist = table.trlist;
@@ -822,42 +906,42 @@ console.log("リスト作成終了", (new Date() - starttime)/1000);
     
     const coltitle = table.getElementsByClassName("coltitle")[0].children[1];
     coltitle.innerHTML = exporttype.selectedOptions[0].label;
-    
-    // 計算用の定数
-    let num = scoredatas.length + (!isarmor);
-    let div = num*(num-1)*(num-2)*(num-3)*100**5; /* 共通分母 5=転生4列+列数抽選率 */
-    let e50 = new BigNumber( Math.LN2 );
-    let e05 = new BigNumber( Math.LN2 ).plus( Math.LN10 );
-    
-    list.forEach((scores, atkidx)=>{
-      let idx = 0;
-      scores.forEach(prob=>{
-        let td = trlist[atkidx][idx].children[1];
-        if( prob <= 0 ){
-          td.innerHTML = `<span class="int">0</span><span class="decimal"></span>`;
-          idx++;
-          return; 
-        }
-        switch( type ){
-          case "numavg":
-            prob = BigNumber(div).div(prob); break;
-          case "num50": /* 誤差を許容する */
-            prob = e50.div( Math.log(div-prob)-Math.log(div)).times(-1); break;
-          case "num95":
-            prob = e05.div( Math.log(div-prob)-Math.log(div)).times(-1); break;
-          case "prob1":
-            prob = BigNumber(prob).div(div); break;
-          case "prob100":
-            prob = BigNumber(prob).div(div).times(100); break;
-          case "prob10000":
-            prob = BigNumber(prob).div(div).times(10000); break;
-        }
-        let [probint, probdecimal] = prob.toFixed().split(".");
-        if( probdecimal > 0 ) probint = "" + probint + ".";
-        td.innerHTML = `<span class="int">${probint}</span><span class="decimal">${probdecimal||""}</span>`;
-        idx++;
+    Object.keys(trlist).forEach(atkidx=>{
+      let trs = trlist[atkidx];
+      trs.forEach(tr=>{
+        let prob = list[tr.atkrank][tr.scidx][1];
+        setProb(tr, prob, type);
       });
     });
+  }
+  
+  /* 単一行を受け取り確率を入れる
+  *  繰り返し呼ばれることを想定するので出力タイプを取得しない
+  */
+  function setProb(tr, prob, type){
+    let td = tr.children[1];
+    if( prob <= 0 ){
+      td.innerHTML = `<span class="int">0</span><span class="decimal"></span>`;
+      return; 
+    }
+    switch( type ){
+      case "numavg":
+        prob = BigNumber(div).div(prob); break;
+      case "num50": /* 誤差を許容する */
+        prob = e50.div( Math.log(div-prob)-Math.log(div)).times(-1); break;
+      case "num95":
+        prob = e05.div( Math.log(div-prob)-Math.log(div)).times(-1); break;
+      case "prob1":
+        prob = BigNumber(prob).div(div); break;
+      case "prob100":
+        prob = BigNumber(prob).div(div).times(100); break;
+      case "prob10000":
+        prob = BigNumber(prob).div(div).times(10000); break;
+    }
+    let [probint, probdecimal] = prob.toFixed().split(".");
+    if( probdecimal > 0 ) probint = "" + probint + ".";
+    td.innerHTML = `<span class="int">${probint}</span><span class="decimal">${probdecimal||""}</span>`;
+    return;
   }
   
   function createTitleElem(){
