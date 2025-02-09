@@ -99,6 +99,8 @@ header {
   width: 90%;
   height: 90%;
   background: #ddd;
+  border: solid #aaa;
+  border-width: 0 3px;
   border-radius: 10px;
   cursor: pointer;
   overflow: hidden;
