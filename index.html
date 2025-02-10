@@ -201,7 +201,7 @@
             }
             btnisboss.classList.toggle('active', chkisboss.checked);
             //simpleatkセレクトのオプション配置
-            initSimpleAtk(chkisboss.checked);
+            initSimpleAtk();
           }
           
           /* issimpleatkボタンの処理 */
@@ -234,15 +234,34 @@
           
           
           //simpleatkの初期化
-          let selsimpleatk = document.getElementById('input-simpleatk');
-          initSimpleAtk(chkisboss.checked);
+          let eqplv = document.getElementById('input-eqplv');
+          eqplv.addEventListener("input", ()=>{initSimpleAtk();});
+          initSimpleAtk();
           
           //simpleatkのオプションを配置（isboss=trueならrank+2）
-          function initSimpleAtk(isboss){
+          function initSimpleAtk(){
+            let eqplv = document.getElementById('input-eqplv');
+            let isboss = document.getElementById('input-isboss');
+            let selsimpleatk = document.getElementById('input-simpleatk');
+            
             const ranks = [5,4,3,2,1,0];
             
             const templateOption = document.createElement('option');
             const fragment = document.createDocumentFragment();
+            
+            // 入力装備レベルの正規化
+            let v = eqplv.valueAsNumber;//数字以外はNaN
+            v = (isNaN(v) || v < 0 ) ? 0 : v;
+            // 転生基準値リストに含まれる数値に丸める
+            for(let i = 転生基準値リスト[0].length; i--;){
+              if(v < 転生基準値リスト[0][i][0]) continue;
+              tenseidata = 転生基準値リスト[0][i];
+              eqplv = tenseidata[0];
+              break;
+            }
+            
+            let lv = ~~(eqplv/40) + 1;
+            isboss = isboss.checked;
             
             ranks.forEach((rank, i) => {
               //オプションは配置済みなら再利用
@@ -256,8 +275,10 @@
               if( rank == 0 ){
                 optionElement.label = "全出力";
               }else{
-                if(isboss) rank += 2;
-                optionElement.label = "RANK " + rank;
+                let r1 = rank;
+                let r2 = r1 + isboss*2;
+                let atktensei = BigNumber( 1.1 ).pow( r1-1 ).times( lv ).times( r2 ).toFixed(1);
+                optionElement.label = "R_" + ( rank + (isboss ? 2 : 0) ) + ` (${atktensei}%)`;
               }
             });
             selsimpleatk.appendChild(fragment);
@@ -543,6 +564,7 @@
   const eqplv = document.getElementById("input-eqplv");
   let dropdown = createDropdown(tempeqplv, null, function(item){
     eqplv.value = item;
+    initSimpleAtk(); // 武器簡易版selectへの反映
   });
   eqplv.parentElement.appendChild(dropdown);
   /* 引数のinput要素に対応した入力補助用のプルダウンを生成して返す(配置はしない) */
@@ -587,7 +609,7 @@
       */
       let shown = (dropdown.style.display === 'block');
       closeDropdowns(); //全てのプルダウンを閉じる
-      if( !shown )dropdown.style.display = 'block'; // メニューの表示/非表示切替
+      if( !shown ) dropdown.style.display = 'block'; // メニューの表示/非表示切替
     });
   
     // コンテナにボタンとドロップダウンを追加
