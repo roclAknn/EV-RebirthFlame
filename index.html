@@ -278,7 +278,7 @@
                 let r1 = rank;
                 let r2 = r1 + isboss*2;
                 let atktensei = BigNumber( 1.1 ).pow( r1-1 ).times( lv ).times( r2 ).toFixed(1);
-                optionElement.label = "R_" + ( rank + (isboss ? 2 : 0) ) + ` (${atktensei}%)`;
+                optionElement.label = "R" + ( rank + (isboss ? 2 : 0) ) + ` (${atktensei}%)`;
               }
             });
             selsimpleatk.appendChild(fragment);
