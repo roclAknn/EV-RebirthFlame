@@ -762,7 +762,7 @@ console.log("出力量", idxnum, stepnum);
           return [];
         };
       }else if( isstepexport > 0 ){
-        window.alert(`出力量が多いため代表値のみ出力します\n${stepnum}->${idxnum}\nステップ出力するにはスコアを小さくしてください`);
+        window.alert(`出力量が多いため有効値のみ出力します\n出力量:${stepnum}->${idxnum}\nステップ出力するにはスコアを小さくしてください`);
         isstepexport = -1;
       }
     }
