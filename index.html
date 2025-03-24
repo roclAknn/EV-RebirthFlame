@@ -327,7 +327,7 @@
           /* exporttypeの処理 */
           const exporttypediv = document.getElementById("exporttypediv");
           const exporttype = document.getElementById("exporttype");
-          const exporttypenames  = ["平均消費数[個]", "50%ライン[個]", "95%ライン[個]", "確率[1/1]", "確率[1/100]", "確率[1/10000]"];
+          const exporttypenames  = ["平均消費数[個]", "50%ライン[個]", "95%ライン[個]", "確率[x1]", "確率[x100]", "確率[x10000]"];
           const exporttypevalues = ["numavg", "num50", "num95", "prob1", "prob100", "prob10000"];
           let inner = `<optgroup>`;
           exporttypenames.forEach((name, idx)=>{
