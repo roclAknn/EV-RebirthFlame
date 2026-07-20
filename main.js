@@ -296,7 +296,6 @@ function initializeUI(){
       if (!el) return;
       // valは文字列
       const val = getCookie(id) ?? defaultValues[id] ?? null;
-      console.log(id, val, el)
       const tagName = el.tagName.toLocaleLowerCase();
       const type = el.type.toLocaleLowerCase();
       if(tagName === "input"){
@@ -359,8 +358,11 @@ function initializeUI(){
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
     els.scrollButtons.bottom.addEventListener("click", ()=>{
+      // scaleを含めて計算
+      const rect = els.maindiv.getBoundingClientRect();
+      let h = rect.bottom - rect.top ;
       window.scrollTo({
-        top: document.documentElement.scrollHeight,
+        top: h - window.innerHeight + 60,
         behavior: "smooth"
       });
     });
