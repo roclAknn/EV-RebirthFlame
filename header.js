@@ -20,7 +20,6 @@ function buildHeader( title, linkEntries ){
       html += `
         <a target="_blank" href="${entry[1]}">${entry[0]}</a>
       `;
-      console.log(html);
     });
     return html;
   };
