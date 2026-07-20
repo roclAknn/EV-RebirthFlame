@@ -1,641 +1,125 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>/MapleStory/ 転生の炎の確率計算器</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-site-verification" content="vkAHjrHWlxI9ch267E96FHR8p9ajVqys8hCnFSBES8A" />
-  <meta name="description" content="メイプルストーリー計算ツール　転生の炎がいくつ必要か、転生スコアごとに表示します" />
-  <link rel="stylesheet" href="a.css">
-  <link rel="icon" type="image/png" href="./images/favicon.png">
-  <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.1.2/bignumber.min.js'></script>
-  <script src="a.js"></script>
-</head>
-<body>
-  <header>
-    <h3 style="margin-top: 0;">/MapleStory/ 転生の炎の確率計算器</h3>
-    <h5 style="margin-top: 0; text-align: right;">
-      <a target="_blank" href="https://github.com/roclAknn/EV-RebirthFlame">GitHub(使い方)</a><br>
-      <a target="_blank" href="https://roclaknn.github.io/EV-Cube-Calculator/">キューブ計算器</a><br>
-      <a target="_blank" href="https://roclaknn.github.io/MapleStory-StatusCalc/">ステータス効率計算器</a>
-    </h5>
-  </header>
-  <div id="main">
-    <div id="headerdiv">
-      <!-- A列 -->
-      <div class="column a">
-        <div class="frame join">
-          <!-- 左右スイッチ uncheck:武器 checked:防具 -->
-          <input type="checkbox" id="input-isarmor" hidden checked>
-          <div id="switch-isarmor" class="switch active" onclick=``>
-            <div class="knob"></div>
-          </div>
-        </div>
-        
-        <div class="frame label">
-          <div class="cell label"><label for="input-eqplv">装備レベル</label></div>
-        </div>
-        <div class="frame input">
-          <input id="input-eqplv" class="input-status no-spin" value="200" type="number" step=1>
-        </div>
-        
-        <div class="frame label">
-          <label for="input-rtype">抽選方法</label>
-        </div>
-        <div class="frame input">
-          <select id="input-rtype" class="input-status no-spin" name="rtype" style="width: 8em;">
-            <optgroup label="転生の炎">
-              <option value="転生深淵" label="転生:深淵">
-              <option value="転生永遠" label="転生:永遠/黒い" selected>
-              <option value="転生強力" label="転生:強力">
-              <option value="転生一般" label="転生:Lv.1XX" style="display: none;">
-            </optgroup>
-            <optgroup label="合成">
-              <option value="合成名匠" label="合成:名匠">
-              <option value="合成職人" label="合成:職人">
-              <option value="合成一般" label="合成:～Lv10" style="display: none;">
-            </optgroup>
-            <optgroup label="製作">
-              <option value="製作名匠" label="製作:名匠">
-              <option value="製作職人" label="製作:職人">
-              <option value="製作一般" label="製作:～Lv.10" style="display: none;">
-            </optgroup>
-            <optgroup label="その他">
-              <option value="ドロップ" label="ドロップ">
-              <option value="欠片交換" label="欠片交換">
-              <option value="チャンスタイム" label="チャンスタイム" style="display: none;">
-              <option value="その他"   label="その他">
-            </optgroup>
-          </select>
-        </div>
-        
-        <div class="frame label">
-          <label for="input-min">出力ボーダー</label>
-        </div>
-        <div class="frame input">
-          <input  id="input-min" name="min" type="number" class="input-status no-spin" step="1" value="100">
-        </div>
-        
-        <div class="frame join">
-          <!-- ONOFFボタン -->
-          <input id="input-isboss" type="checkbox" checked hidden>
-          <div id="button-isboss" class="divbutton active"></div>
-        </div>
-        <div class="frame join">
-          <!-- ONOFFボタン -->
-          <input id="input-issimpleatk" type="checkbox" checked hidden>
-          <div id="button-issimpleatk" class="divbutton notarmor active"></div>
-        </div>
-        <style>
-          #button-isboss::before{
-            content: 'ボス装備';
-          }
-          #button-issimpleatk::before{
-            content: '武器簡易版';
-          }
-        </style>
-        
-        <div class="frame label">
-          <label for="input-simpleatk" class="issimpleatk notarmor">攻撃/魔力目標</label>
-          <label for="input-weaponatk" class="notsimpleatk notarmor">武器攻撃/魔力</label>
-        </div>
-        <div class="frame input">
-          <select id="input-simpleatk" class="input-status no-spin issimpleatk notarmor"></select>
-          <input id="input-weaponatk" type="number" class="input-status no-spin notsimpleatk notarmor" value="400">
-        </div>
-      </div>
+  <head>
+    <title>/MapleStory/ 転生の炎の確率計算器</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="vkAHjrHWlxI9ch267E96FHR8p9ajVqys8hCnFSBES8A" />
+    <meta name="description" content="メイプルストーリー計算ツール　転生の炎がいくつ必要か、転生スコアごとに平均値を計算します" />
+    <script src='decimal.min.js'></script>
+    <script src='bignumber.min.js'></script>
+    <script src="header.js"></script>
+    <script src="common.js"></script>
+    <script src="main.js"></script>
+    <script src="calc.js"></script>
+    <link rel="stylesheet" href="main.css">
+  </head>
+  <body onload="initialize()">
+    <main>
+      <div id="maindiv-wrapper">
+        <div id="maindiv" class="flex isarmorselected issimpleatkselected">
+          <div id="header-row" class="colflex">
+            <!-- header-row  main-column -------------------------------------------------->
+            <div id="main-column">
+              <div id="eqptype-container" class="cell join flex">
+                <div class="eqptype-button eqptype-weapon" data-type="武器">
+                  武器
+                </div>
+                <div class="eqptype-button eqptype-armor selected" data-type="防具">
+                  防具
+                </div>
+                <input type="checkbox" id="input-isarmor" class="input-status" hidden checked>
+              </div>
 
-      <!-- B列 -->
-      <div class="column b">
-        <div class="frame label"><label for="input-str">STR</label></div>
-        <div class="frame input"><input  id="input-str" name="str" type="number" class="input-status no-spin" step="any" value="1"></div>
-        <div class="frame label"><label for="input-dex">DEX</label></div>
-        <div class="frame input"><input  id="input-dex" name="dex" type="number" class="input-status no-spin" step="any" value="0.1"></div>
-        <div class="frame label"><label for="input-int">INT</label></div>
-        <div class="frame input"><input  id="input-int" name="int" type="number" class="input-status no-spin" step="any" value="0"></div>
-        <div class="frame label"><label for="input-luk">LUK</label></div>
-        <div class="frame input"><input  id="input-luk" name="luk" type="number" class="input-status no-spin" step="any" value="0"></div>
-        <div class="frame label"><label for="input-all">ALL％</label></div>
-        <div class="frame input"><input  id="input-all" name="all" type="number" class="input-status no-spin" step="any" value="10"></div>
-        <div class="frame label"><label for="input-atk">攻撃力</label></div>
-        <div class="frame input"><input  id="input-atk" name="atk" type="number" class="input-status no-spin" step="any" value="2.5"></div>
-        <div class="frame label"><label for="input-ma">魔力</label></div>
-        <div class="frame input"><input  id="input-ma"  name="ma"  type="number" class="input-status no-spin" step="any" value="0"></div>
-      </div>
-
-      <!-- C列 -->
-      <div class="column c">
-        <div class="frame label"><label for="input-hp">HP</label></div>
-        <div class="frame input"><input  id="input-hp"    name="hp"    type="number" class="input-status no-spin" step="any" value="0"></div>
-        <div class="frame label"><label for="input-mp">MP</label></div>
-        <div class="frame input"><input  id="input-mp"    name="mp"    type="number" class="input-status no-spin" step="any" value="0"></div>
-        <div class="frame label"><label for="input-def">防御力</label></div>
-        <div class="frame input"><input  id="input-def"   name="def"   type="number" class="input-status no-spin" step="any" value="0"></div>
-        <div class="frame label"><label for="input-declv">着用Lv減少</label></div>
-        <div class="frame input"><input  id="input-declv" name="declv" type="number" class="input-status no-spin" step="any" value="0"></div>
-        
-        <div class="frame label">
-          <label for="input-spd" class="isarmor">移動速度</label>
-          <label for="input-dam" class="notarmor">ダメージ％</label>
-        </div>
-        <div class="frame input">
-          <input  id="input-spd" name="spd" type="number" class="input-status no-spin isarmor"  step="any" value="0">
-          <input  id="input-dam" name="dam" type="number" class="input-status no-spin notarmor" step="any" value="11">
-        </div>
-        <div class="frame label">
-          <label for="input-jump"    class="isarmor">ジャンプ</label>
-          <label for="input-bossdam" class="notarmor">ボスダメ％</label>
-        </div>
-        <div class="frame input">
-          <input  id="input-jump"    name="jump"    type="number" class="input-status no-spin isarmor"  step="any" value="0">
-          <input  id="input-bossdam" name="bossdam" type="number" class="input-status no-spin notarmor" step="any" value="11">
-        </div>
-        <div class="frame join"></div>
-      </div>
-      <script>
-        {
-          /* isarmorスイッチの処理 */
-          let chkisarmor = document.getElementById("input-isarmor");
-          let swtisarmor = document.getElementById("switch-isarmor");
-          let elemisarmor = document.getElementsByClassName('isarmor');
-          let elemnotarmor = document.getElementsByClassName('notarmor');
-          
-          //ロード時に同期
-          setIsArmor(chkisarmor.checked);
-          
-          swtisarmor.onclick = function(){
-            setIsArmor();
-          };
-          /* isarmorボタンの切り替え、反映を一括処理　-1:toggle */
-          function setIsArmor(isarmor=-1){
-            if( isarmor == -1 ){
-              //toggle処理
-              chkisarmor.checked = !chkisarmor.checked;
-              isarmor = chkisarmor.checked; //chkに従う
-            }
-            swtisarmor.classList.toggle('active', isarmor);
-            for(let elem of elemisarmor){
-              elem.classList.toggle('hiddenisarmor', !isarmor);
-            }
-            for(let elem of elemnotarmor){
-              elem.classList.toggle('hiddenisarmor', isarmor);
-            }
-          }
-          
-          
-          
-          /* isbossボタンの処理 */
-          let chkisboss = document.getElementById('input-isboss');
-          let btnisboss = document.getElementById('button-isboss');
-          
-          //ロード時に同期
-          btnisboss.classList.toggle('active', chkisboss.checked);
-          
-          btnisboss.onclick = function(){
-            setIsBoss();
-          };
-          function setIsBoss(isboss=-1){
-            if( isboss == -1 ){
-              //toggle処理
-              chkisboss.checked = !chkisboss.checked;
-              isboss = chkisboss.checked;
-            }
-            btnisboss.classList.toggle('active', chkisboss.checked);
-            //simpleatkセレクトのオプション配置
-            initSimpleAtk();
-          }
-          
-          /* issimpleatkボタンの処理 */
-          let chkissimpleatk = document.getElementById('input-issimpleatk');
-          let btnissimpleatk = document.getElementById('button-issimpleatk');
-          let elemissimpleatk = document.getElementsByClassName('issimpleatk');
-          let elemnotsimpleatk = document.getElementsByClassName('notsimpleatk');
-          
-          //ロード時に同期
-          setIsSimpleAtk(chkissimpleatk.checked);
-          
-          btnissimpleatk.onclick = function(){
-            setIsSimpleAtk();
-          };
-          /* issimpleatkボタンの切り替え、反映を一括処理　-1:toggle */
-          function setIsSimpleAtk(issimpleatk=-1){
-            if( issimpleatk == -1 ){
-              //toggle処理
-              chkissimpleatk.checked = !chkissimpleatk.checked;
-              issimpleatk = chkissimpleatk.checked; //chkに従う
-            }
-            btnissimpleatk.classList.toggle('active', issimpleatk);
-            for(let elem of elemissimpleatk){
-              elem.classList.toggle('hiddenissimpleatk', !issimpleatk);
-            }
-            for(let elem of elemnotsimpleatk){
-              elem.classList.toggle('hiddenissimpleatk', issimpleatk);
-            }
-          }
-          
-          
-          //simpleatkの初期化
-          let eqplv = document.getElementById('input-eqplv');
-          eqplv.addEventListener("input", ()=>{initSimpleAtk();});
-          initSimpleAtk();
-          
-          //simpleatkのオプションを配置（isboss=trueならrank+2）
-          function initSimpleAtk(){
-            let eqplv = document.getElementById('input-eqplv');
-            let isboss = document.getElementById('input-isboss');
-            let selsimpleatk = document.getElementById('input-simpleatk');
-            
-            const ranks = [5,4,3,2,1,0];
-            
-            const templateOption = document.createElement('option');
-            const fragment = document.createDocumentFragment();
-            
-            // 入力装備レベルの正規化
-            let v = eqplv.valueAsNumber;//数字以外はNaN
-            v = (isNaN(v) || v < 0 ) ? 0 : v;
-            // 転生基準値リストに含まれる数値に丸める
-            for(let i = 転生基準値リスト[0].length; i--;){
-              if(v < 転生基準値リスト[0][i][0]) continue;
-              tenseidata = 転生基準値リスト[0][i];
-              eqplv = tenseidata[0];
-              break;
-            }
-            
-            let lv = ~~(eqplv/40) + 1;
-            isboss = isboss.checked;
-            
-            ranks.forEach((rank, i) => {
-              //オプションは配置済みなら再利用
-              let optionElement = selsimpleatk.options[i];
-              if( !optionElement ){
-                optionElement = templateOption.cloneNode(true);
-                fragment.appendChild(optionElement);
-              }
+              <div class="cell label">
+                <label for="input-eqplv">装備レベル</label>
+              </div>
+              <div class="cell input">
+                <input id="input-eqplv" class="input-status" value="200" type="number" step=1>
+              </div>
               
-              optionElement.value = rank; //値はボスボーナスを乗せない
-              if( rank == 0 ){
-                optionElement.label = "全出力";
-              }else{
-                let r1 = rank;
-                let r2 = r1 + isboss*2;
-                let atktensei = BigNumber( 1.1 ).pow( r1-1 ).times( lv ).times( r2 ).toFixed(1);
-                optionElement.label = "R" + ( rank + (isboss ? 2 : 0) ) + ` (${atktensei}%)`;
-              }
-            });
-            selsimpleatk.appendChild(fragment);
-          }
-        }
-      </script>
-    </div>
-    <div id="exportbuttondiv">
-      <div id="openerdiv" style="position: relative;">
-        <div class="arrowdiv"></div>
-      </div>
-      
-      <div>
-        <div id="exportbutton">出力</div>
-      </div>
-      
-      <div id="exporttypediv" style="align-content: center;">
-      </div>
-      <select id="exporttype" hidden></select>
-      
-      <div id="ctrlpanemovediv" style="height: 30px;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 50" style="height:100%">
-          <!-- 上下矢印 -->
-          <path fill="white" d="M30 10 L10 20 L20 20 L20 30 L10 30 L30 40 L50 30 L40 30 L40 20 L50 20 Z" stroke-width="2" stroke="#333"></path>
-          <!-- 斜め赤線 -->
-          <path class="stopmark" stroke="red" d="M50 10 L10 40" stroke-width="4" fill="#f44"></path>
-        </svg>
-        <input type=checkbox id="ctrlpanemove" hidden>
-      </div>
-      <script>
-        {
-          /* openerの処理 */
-          let openerdiv = document.getElementById("openerdiv");
-          openerdiv.onclick = function() {
-            let headerdiv = document.getElementById("headerdiv");
-            let isclose = headerdiv.classList.toggle("close");
-            openerdiv.classList.toggle("active", isclose);
-          };
-          
-          /* exportbuttonの処理 */
-          const exportbutton = document.getElementById("exportbutton");
-          exportbutton.onclick = function(){
-            onclickoutputbutton();
-          };
-          
-          /* exporttypeの処理 */
-          const exporttypediv = document.getElementById("exporttypediv");
-          const exporttype = document.getElementById("exporttype");
-          const exporttypenames  = ["平均消費数[個]", "50%ライン[個]", "95%ライン[個]", "確率[x1]", "確率[x100]", "確率[x10000]"];
-          const exporttypevalues = ["numavg", "num50", "num95", "prob1", "prob100", "prob10000"];
-          let inner = `<optgroup>`;
-          exporttypenames.forEach((name, idx)=>{
-            let value = exporttypevalues[idx];
-            inner += `<option value="${value}" label="${name}" ${idx==0 ? "selected" : ""}></option>`;
-          });
-          inner += `</optgroup>`;
-          exporttype.innerHTML = inner;
-          // 読み込み時に同期
-          let idx = exporttype.selectedIndex;
-          exporttypediv.innerHTML = exporttype.selectedOptions[0].label;
-          exporttypediv.onclick = function(){
-            exporttype.selectedIndex = (exporttype.selectedIndex + 1) % exporttype.length;
-            exporttypediv.innerHTML = exporttype.selectedOptions[0].label;
-            for( let table of document.querySelectorAll(".pane>table") ){
-              table.setProbs();
-            }
-          }
-          
-          /* ctrlpanemoveの処理 */
-          const ctrldiv = document.getElementById("ctrlpanemovediv");
-          const checkbox = document.getElementById("ctrlpanemove");
-          const stopmark = ctrldiv.getElementsByClassName("stopmark")[0];
-          stopmark.style.display = checkbox.checked ? "none" : ""; //読み込み時に同期
-          ctrldiv.onclick = function() { //checked:移動可能
-            checkbox.checked = !checkbox.checked;
-            stopmark.style.display = checkbox.checked ? "none" : "";
-          }
-          
-        }
-      </script>
-    </div>
-    <div id="exportdiv">
-      <div id="panestitlediv" class="panesdiv"></div>
-      <div id="panesdiv" class="panesdiv"></div>
-    </div>
-  </div>
+              <div class="cell label">
+                <label for="input-min">出力の最低値</label>
+              </div>
+              <div class="cell input">
+                <input id="input-min" name="min" type="number" class="input-status no-spin" step="1" value="100">
+              </div>
+              
+              
+              <div class="cell join">
+                <div id="button-isboss" class="divbutton active"
+                 data-input="#input-isboss" data-togglecln="isbossselected">
+                  ボス装備 BONUS
+                </div>
+                <input id="input-isboss" class="input-status" type="checkbox" checked hidden>
+              </div>
 
-<script>
-{
-  const panesdiv = document.getElementById('panesdiv');
-  const panestitlediv = document.getElementById('panestitlediv');
-  const paneslist = [];
-  window.doneAddPane = true;
-  const panewidth = 180; /*px*/
-  const maxpanenum = 3;
-  
-  // transitionendを待つ関数を作成
-  function waitForTransition(element, timeout = 1000) {
-    return new Promise(resolve => {
-      let resolved = false;
-      
-      const handler = () => {
-        if (!resolved) {
-          resolved = true; resolve();
-        }
-      };
-      
-      // transitionend イベントで解決
-      element.addEventListener('transitionend', handler, { once: true });
-      
-      // タイムアウトを設定
-      setTimeout(() => {
-        if (!resolved) {
-          resolved = true; resolve();
-        }
-      }, timeout);
-    });
-  }
-  
-  function createAndAddPanedata(elem, titleelem) {
-    // 過剰なペインの追加を抑制
-    // 新ペインの表示完了でtrueにする
-    if (!doneAddPane) return;
-    doneAddPane = false;
-    
-    const pane = createPane();
-    const title = createPaneTitle();
-    const panedata = {
-      pane: pane
-    , title: title
-    };
-    if (elem){
-      pane.appendChild(elem);
-    }
-    if (titleelem){
-      title.appendChild(titleelem);
-    }
-    addPanedata(panedata);
-  }
+              <div class="cell join">
+                <div id="button-issimpleatk" class="divbutton notarmor active"
+                 data-input="#input-issimpleatk" data-togglecln="issimpleatkselected">
+                  武器A/MA 簡易版
+                </div>
+                <input id="input-issimpleatk" class="input-status" type="checkbox" checked hidden>
+              </div>
+              
+              <div class="cell label">
+                <label for="input-simpleatk" class="issimpleatk notarmor">A/MAランク</label>
+                <label for="input-weaponatk" class="notsimpleatk notarmor">武器 素A/MA</label>
+              </div>
+              <div class="cell input">
+                <select id="input-simpleatk" class="input-status issimpleatk notarmor"></select>
+                <input id="input-weaponatk" type="number" class="input-status notsimpleatk notarmor" value="400">
+              </div>
+            </div>
 
-  async function addPanedata(panedata) {
-    const pane = panedata.pane;
-    const title = panedata.title;
-    
-    paneslist.unshift(panedata);
-    panesdiv.appendChild(pane);
-    panestitlediv.classList.add("overflowhidden");
-    panestitlediv.appendChild(title);
-    
-    if (paneslist.length <= 1){
-      //
-    }else if (paneslist.length > maxpanenum){
-      //ここではペインの表示を消すのみ
-      let oldPane = paneslist[maxpanenum];
-      let elem = oldPane.pane.firstElementChild;
-      if( elem ){
-        oldPane.pane.style.height = "" + elem.scrollHeight + "px"; // アニメーション用に高さを数値で再設定
-      }
-      setTimeout(()=>{
-        oldPane.pane.style.height = '0px';
-      }, 50);
-      await waitForTransition(oldPane.pane);
-    }
-    
-    // すべてのペインを右移動
-    setTimeout(()=>{
-      paneslist.forEach((panedata, index) => {
-        let borderwidth = 1;
-        let translate = index * (panewidth + borderwidth);
-        panedata.pane.style.transform = `translateX(${translate}px)`;
-        panedata.title.style.transform = `translateX(${translate}px)`;
-      });
-    }, 50);
-    await waitForTransition(title);
-    
-    if (paneslist.length > maxpanenum){
-      //古いペインの削除
-      let oldPane = paneslist.pop();
-      panesdiv.removeChild(oldPane.pane);
-      panestitlediv.removeChild(oldPane.title);
-    }
-    
-    // 右枠線が飛び出すので0pxに
-    let lastpane = paneslist[ maxpanenum-1 ];
-    if( lastpane ){
-      lastpane.title.style.borderRight = "0px";
-    }
-    // プルダウンメニュー表示のため
-    panestitlediv.classList.remove("overflowhidden");
-    
-    // 下に伸びながら表示する
-    setTimeout(()=>{
-      let elem = pane.firstElementChild;
-      if( elem ){
-        pane.style.height = "" + elem.scrollHeight + "px";
-      }
-    }, 50);
-    await waitForTransition(pane);
-    pane.style.height = "fit-content"; //表示が終わったあとの変化はアニメーションさせない
-    fixPanesdivHeight();
-    doneAddPane = true;
-  }
-  
-  function createPane() {
-    // 新しいペインの作成
-    const pane = document.createElement('div');
-    pane.className = 'pane';
-    pane.style.transform = `translateX(${0}px)`;
-    
-    // 縦方向にドラッグできるようにする
-    const checkbox = document.getElementById("ctrlpanemove"); //機能のONOFF制御を取得 checked:ON
-    pane.onmousedown = pane.ontouchstart = startevent; 
-    function startevent(e){
-      if( !checkbox.checked ) return;
-      
-      e.preventDefault();
-      
-      let clientY;
-      if (e.touches && e.touches.length > 0) {
-        clientY = e.touches[0].clientY;
-      }else{
-        clientY = e.clientY;
-      }
-      
-      const startY = clientY;
-      const startTop = parseFloat(pane.style.top || '0');
-      
-      function moveevent(e) {
-        e.preventDefault();
-        let clientY;
-        if (e.touches && e.touches.length > 0) {
-          clientY = e.touches[0].clientY;
-        }else{
-          clientY = e.clientY;
-        }
-        const newY = clientY - startY + startTop;
-        pane.style.top = `${ Math.max(0, newY) }px`;
-      }
-      function endevent() {
-        e.preventDefault();
-        document.removeEventListener('mousemove', moveevent);
-        document.removeEventListener('mouseup', endevent);
-        document.removeEventListener('touchmove', moveevent);
-        document.removeEventListener('touchend', endevent);
-        fixPanesdivHeight();
-      }
-      document.removeEventListener('mousemove', moveevent);
-      document.removeEventListener('mouseup', endevent);
-      document.removeEventListener('touchmove', moveevent);
-      document.removeEventListener('touchend', endevent);
-      document.addEventListener('mousemove', moveevent);
-      document.addEventListener('mouseup', endevent);
-      document.addEventListener('touchmove', moveevent);
-      document.addEventListener('touchend', endevent);
-    };
-    // ペインの移動機能がONのときは選択禁止にする
-    pane.addEventListener('selectstart', (e) => {
-      if( !checkbox.checked ) return;
-      e.preventDefault();
-    });
-    return pane;
-  }
-  
-  function createPaneTitle() {
-    // 新しいペインタイトルの作成
-    const title = document.createElement('div');
-    title.className = 'panetitle';
-    title.style.transform = `translateX(${-panewidth}px)`;
-    return title;
-  }
-  
-  function fixPanesdivHeight(){
-    let h = 0;
-    paneslist.forEach(panedata=>{
-      let pane = panedata.pane;
-      h = Math.max( h, pane.scrollHeight + pane.offsetTop );
-    });
-    panesdiv.style.height = "" + h + "px";
-  }
-  
-  
-  const tempeqplv = [250, 200, 160, 150, 140, 130, 120, 110, 100, 0];
-  const eqplv = document.getElementById("input-eqplv");
-  let dropdown = createDropdown(tempeqplv, null, function(item){
-    eqplv.value = item;
-    initSimpleAtk(); // 武器簡易版selectへの反映
-  });
-  eqplv.parentElement.appendChild(dropdown);
-  /* 引数のinput要素に対応した入力補助用のプルダウンを生成して返す(配置はしない) */
-  function createDropdown(items, button, callback) {
-    // メインのdivを作成
-    let container = document.createElement('div');
-    container.className = 'button-dropdown-wrapper';
-  
-    // プルダウンメニューを作成
-    let dropdown = document.createElement('div');
-    dropdown.className = 'template-dropdown';
-  
-    // リストを作成
-    let ul = document.createElement('ul');
-    items.forEach((item, idx) => {
-      let li = document.createElement('li');
-      li.innerHTML = item;
-  
-      // 項目をクリックしたときの処理
-      li.addEventListener('click', function() {
-        dropdown.style.display = 'none'; // メニューを閉じる
-        if(callback) callback(item, idx);
-      });
-  
-      ul.appendChild(li);
-    });
-  
-    dropdown.appendChild(ul);
-    
-    if( !button ){
-      // ボタンを作成
-      button = document.createElement('button');
-      button.textContent = '▼';
-    }
-    
-    // ボタンをクリックしたときの処理
-    button.addEventListener('click', function(event) {
-      event.stopPropagation(); // 他のクリックイベントをキャンセル
-      /* 
-      *  異なるプルダウンボタンを押すと閉じずに複数開けるので
-      *  全てのプルダウンを閉じてから、元から非表示だった場合にはプルダウンを開く
-      */
-      let shown = (dropdown.style.display === 'block');
-      closeDropdowns(); //全てのプルダウンを閉じる
-      if( !shown ) dropdown.style.display = 'block'; // メニューの表示/非表示切替
-    });
-  
-    // コンテナにボタンとドロップダウンを追加
-    container.appendChild(button);
-    container.appendChild(dropdown);
-  
-    return container; // 生成した要素を返す(配置はしない)
-  }
-  
-  // 領域外クリックでプルダウンメニューを閉じる処理
-  document.addEventListener('click', closeDropdowns);
-  function closeDropdowns(event) {
-    let dropdowns = document.querySelectorAll('.template-dropdown');
-    dropdowns.forEach(dropdown => {
-      dropdown.style.display = 'none'; // 全てのプルダウンを閉じる
-    });
-  }
-  
-}
-</script>
+            <!-- header-row  sub-column ------------------------------------------------->
+            <div id="sub-column" class="flex">
+              <div id="status-template-row">
+                <label for="status-template">転生スコア基準</label>
+              </div>
+              <div id="status-table"></div>
+            </div>
+          </div>
 
-</body>
+
+          <!-- condition-row ------------------------------------------>
+          <div id="condition-row" class="colflex">
+            <div class="opener"></div>
+            <button id="export-button">出力</button>
+            <div id="condition-expantion-container">
+              <div id="condition-eqptype"></div>
+              <div id="condition-eqptype-text"></div>
+            </div>
+            <input id="export-numinput" type="number" value="1" min="1" step="1">
+            <div id="export-typediv" style="align-content: center;"></div>
+            <select id="export-type" hidden></select>
+            <div id="align-panesdiv" style="height: 30px;" title="並び替えなし" data-mode="none">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 50" style="height:100%">
+                <rect x="6" y="6" width="18" height="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                <rect x="6" y="21" width="18" height="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                <rect x="6" y="36" width="18" height="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                <rect x="36" y="6" width="18" height="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                <rect x="36" y="36" width="18" height="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                <line x1="24" y1="9.5" x2="36" y2="9.5" stroke="#333" stroke-width="2"/>
+                <line x1="24" y1="39.5" x2="36" y2="39.5" stroke="#333" stroke-width="2"/>
+                <path class="stopmark" stroke="red" d="M55 5 L5 45" stroke-width="4" fill="#f44"/>
+                <text class="align-mode-label" x="30" y="27" text-anchor="middle" dominant-baseline="central"
+                      font-size="32" font-weight="bold" fill="#333" font-family="sans-serif"></text>
+              </svg>
+            </div>
+            <select id="align-panes" hidden>
+              <option value="none" selected></option>
+              <option value="score"></option>
+              <option value="prob"></option>
+            </select>
+          </div>
+
+          <!-- export-row ------------------------------------------>
+          <div id="export-row" class="colflex"></div>
+        </div>
+      </div>
+    </main>
+    <script>
+    </script>
+  </body>
 </html>
-  
-
-
-
-
