@@ -292,6 +292,7 @@ const 出力タイプ名テキスト = {
 
 function getAtkTensei(lv, rank, isboss){
   if (rank < 1) return BigNumber.zero;
+  if (lv > 200) lv = 250;
   lv = ~~(lv/40) + 1;
   const r1 = rank;
   const r2 = r1 + isboss * 2;
