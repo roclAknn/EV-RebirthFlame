@@ -524,8 +524,9 @@ function initSimpleAtk(){
 const PANE_HEADER_HEIGHT = 28;
 const PANE_ROW_HEIGHT = 25;
 
-function buildMergedRows(panes, issimpleatk, mode){
+function buildMergedRows(panes, issimpleatk, mode, exporttype){
   const isScoreMode = mode === "score";
+  const isProbExport = /^prob/.test(exporttype);
   if (isScoreMode){
     const scoreMap = new Map();
     panes.forEach((panedata, paneIdx) => {
@@ -559,9 +560,15 @@ function buildMergedRows(panes, issimpleatk, mode){
       } else if (prob1 === null){
         res = -1;
       } else {
-        res = prob0.lte(prob1) ? -1 : 1;
+        // 期待値は昇順、確率は降順
         let diff = prob0.minus(prob1).abs();
-        if ( (res < 0 ? prob0 : prob1).div(100).gte(diff)) res = 0; // 差が小さければ同値扱い
+        if (!isProbExport){
+          res = prob0.lte(prob1) ? -1 : 1;
+          if ( (res < 0 ? prob0 : prob1).div(100).gte(diff)) res = 0; // 差が小さければ同値扱い
+        } else {
+          res = prob0.gte(prob1) ? -1 : 1;
+          if ( (res < 0 ? prob1 : prob0).div(100).gte(diff)) res = 0; // 差が小さければ同値扱い
+        }
       }
       const probs = [null, null];
       if (res <= 0) probs[0] = pane0[p0++];
@@ -633,15 +640,6 @@ function resetPaneLayout(idx){
 
 function fixPaneContainerHeights(animate = false){
   const minH = 200;
-  /*
-  els.pane.bodys.forEach(body => {
-    maxH = Math.max(maxH, body.offsetHeight);
-  });
-  els.pane.bodycontainers.forEach(container => {
-    container.classList.toggle("animate-height", animate);
-    container.style.height = maxH + "px";
-  });
-  */
   els.pane.bodys.forEach( (body, idx) => {
     let maxH = Math.max(minH, body.offsetHeight);
     const container = els.pane.bodycontainers[idx];
@@ -652,6 +650,7 @@ function fixPaneContainerHeights(animate = false){
 
 function updatePaneAlignment(animate){
   const mode = els.alignpanes.value;
+  const exporttype = els.export.type.value;
   const beforeRects = animate ? captureCellRects() : null;
 
   if (mode === "none"){
@@ -663,8 +662,8 @@ function updatePaneAlignment(animate){
 
   const panes = exportData.panes;
   const issimpleatk = exportData.input?.issimpleatk ?? els.input.issimpleatk.checked;
-  const mergedRows = buildMergedRows(panes, issimpleatk, mode);
   // 空の要素を挿入して隙間を空け、モードに合わせて並べ替え
+  const mergedRows = buildMergedRows(panes, issimpleatk, mode, exporttype);
   panes.forEach((panedata, paneIdx) => {
     const body = els.pane.bodys[paneIdx];
 
