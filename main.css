@@ -544,9 +544,10 @@ main.fit {
   font-size: 14px;
   padding: 2px 6px;
   height: 25px;
-  align-content: center;
   overflow: hidden;
   z-index: 2;
+  display: flex;
+  align-items: center;
 }
 .pane-cell:not(.coltitle) {
   transition: transform 0.5s ease;
