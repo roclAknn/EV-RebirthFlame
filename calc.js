@@ -107,7 +107,6 @@ function getTopnumMap(input, item, eqplv){
       if (ret <= n) return null;
       return ret;
     }
-
     // 転生オプション(スコア降順)組み合わせ総当り
     n1:for (let n1 = 0, n1len = getLen(1, n1) ?? n1+1; n1 < n1len; n1++){
       let s1 = 1 <= linenum ? notZeroScores[n1] : null;
@@ -120,12 +119,13 @@ function getTopnumMap(input, item, eqplv){
             let s4 = 4 <= linenum ? notZeroScores[n4] : null;
 
             /*---- スコアの記録 ---------------------------------------*/
-            const nzs = notZeroScores;
-            const selectedZeroNums =
-                n4 < notZeroNums ? 0
-              : n3 < notZeroNums ? 1
-              : n2 < notZeroNums ? 2
-              : n1 < notZeroNums ? 3 : 4;
+            const countNZ =
+              notZeroNums <= n1 ? 0 :
+              notZeroNums <= n2 ? 1 :
+              notZeroNums <= n3 ? 2 :
+              notZeroNums <= n4 ? 3 : 4;
+            const selectedZeroNums = linenum > countNZ ? linenum - countNZ : 0;
+
 
             // 足切り：ランク総当り前
             const isWeaponAtk = (n1 == 0 && isWeapon);
@@ -151,7 +151,6 @@ function getTopnumMap(input, item, eqplv){
                 } else break n4;
               }
             }
-
             {// ランク総当りでスコアごとの組み合わせ数を格納
               // r1 ~ r4はボスボーナスなしのランク
               const boss = isboss * 2;
@@ -213,7 +212,6 @@ function getTopnumMap(input, item, eqplv){
       }
     }
   }
-
   // スコアごとの分子リスト(Map)の作成
   let topnumMap = new Map();
   {
