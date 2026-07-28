@@ -119,6 +119,7 @@ function getTopnumMap(input, item, eqplv){
             let s4 = 4 <= linenum ? notZeroScores[n4] : null;
 
             /*---- スコアの記録 ---------------------------------------*/
+            const nzs = notZeroScores;
             const countNZ =
               notZeroNums <= n1 ? 0 :
               notZeroNums <= n2 ? 1 :
