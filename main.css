@@ -78,7 +78,7 @@ main.fit {
   transform-origin: top center;
   display: block;
   width: 100%;
-  min-width: max-content;
+  min-width: 520px; /* pane幅依存 */
   max-width: 640px;
 }
 
@@ -314,10 +314,12 @@ main.fit {
   display: flex;
   gap: 8px;
   align-items: center;
+  white-space: nowrap;
+  min-width: 0;
 }
 #condition-eqptype {
   height: 100%;
-  width: 40px;
+  min-width: 40px;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center center;
