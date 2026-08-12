@@ -316,6 +316,7 @@ main.fit {
   align-items: center;
   white-space: nowrap;
   min-width: 0;
+  overflow: hidden;
 }
 #condition-eqptype {
   height: 100%;
