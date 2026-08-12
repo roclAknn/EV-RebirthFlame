@@ -70,8 +70,10 @@ function initializeUI(){
     },
     opener: document.querySelector("#condition-row .opener"),
     condition: {
+      exported: document.querySelector("#condition-exported"),
       eqptype: document.querySelector("#condition-eqptype"),
       eqptypeText: document.querySelector("#condition-eqptype-text"),
+      isbossText: document.querySelector("#condition-isboss-text"),
     },
     export: {
       export: document.querySelector("#export-button"),
@@ -366,6 +368,8 @@ function initializeUI(){
         behavior: "smooth"
       });
     });
+    els.headerrow.addEventListener("input", onHeaderRowInputChange);
+    els.headerrow.addEventListener("change", onHeaderRowInputChange);
   }
 
   {// 初期値の反映
@@ -438,6 +442,7 @@ function update(){
   }
   initSimpleAtk();
   // updateStatusTable();
+  updateExportButtonState();
 }
 
 function updateEquipType(){
@@ -710,6 +715,48 @@ function updatePaneAlignment(animate){
   fixPaneContainerHeights(animate);
 }
 
+function convertInputsForExportData(values){
+  const entries = Object.entries(values);
+  // キーを"input-"を外したものに変更
+  entries.forEach( entry => {
+    const key = entry[0];
+    const newkey = /^input-(.+)/.exec(key)?.[1];
+    if (!newkey) return;
+    entry[0] = newkey;
+  });
+  return Object.fromEntries(entries);
+}
+
+function getCurrentExportInput(){
+  const values = getInputsWithSetCookie("", "noCookie");
+  return convertInputsForExportData(values);
+}
+
+function isSameExportInput(a, b){
+  if (!a || !b) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every(key => key in b && a[key] === b[key]);
+}
+
+function setExportButtonExported(exported){
+  els.condition.exported.classList.toggle("is-exported", exported);
+}
+
+function updateExportButtonState(){
+  if (!exportData.input){
+    setExportButtonExported(false);
+    return;
+  }
+  setExportButtonExported(isSameExportInput(exportData.input, getCurrentExportInput()));
+}
+
+function onHeaderRowInputChange(e){
+  if (!/^input-/.test(e.target.id)) return;
+  updateExportButtonState();
+}
+
 let isExportingAll = false;
 let isExporting = false;
 // 出力ボタンクリック処理
@@ -719,30 +766,23 @@ function exportAllPane(){
   isExportingAll = true;
 
   const values = getInputsWithSetCookie();
-  const entries = Object.entries(values);
-  // キーを"input-"を外したものに変更
-  entries.forEach( entry => {
-    const key = entry[0];
-    const newkey = /^input-(.+)/.exec(key)?.[1];
-    if (!newkey) return;
-    entry[0] = newkey;
-  });
-  
   // 出力時の入力データをキャッシュしておく
-  exportData.input = Object.fromEntries(entries);
+  exportData.input = convertInputsForExportData(values);
   const panelv = els.pane.eqplvinputs;
   panelv[0].value = panelv[1].value = exportData.input.eqplv;
   panelv[0].oninput(); panelv[1].oninput();
 
   // condition-bar更新
-  const {isarmor} = exportData.input;
+  const {isarmor, isboss} = exportData.input;
   const typename = !isarmor ? "武器" : "防具";
   els.condition.eqptype.style.backgroundImage = `url("./images/${typename}.png")`;
   els.condition.eqptypeText.textContent = typename;
+  els.condition.isbossText.textContent = isboss ?  "ボス" : "一般";
 
   exportPane(0);
   exportPane(1);
   isExportingAll = false;
+  updateExportButtonState();
 }
 
 function exportPane(idx){
@@ -826,12 +866,16 @@ function buildPaneBody(idx){
   }
 }
 
-
-function getInputsWithSetCookie(mode = ""){ // default: すべて保存
+function getInputsWithSetCookie(mode = "", cookiemode = ""){ // default: すべて保存
   const isOnlyStatus = mode === "onlyStatus";
   const isWithoutStatus = mode === "withoutStatus";
   if (mode !== "" && !isOnlyStatus && !isWithoutStatus){
     console.error("getInputsWithSetCookie", "不明なモード", mode);
+    return;
+  }
+  const isNoCookie = cookiemode === "noCookie";
+  if (cookiemode !== "" && !isNoCookie){
+    console.error("getInputsWithSetCookie", "不明なモード", cookiemode);
     return;
   }
   const inputs = {};
@@ -842,7 +886,7 @@ function getInputsWithSetCookie(mode = ""){ // default: すべて保存
     const val = getValue(el);
     if ( isOnlyStatus && !isStatus ) return;
     if ( isWithoutStatus && isStatus) return;
-    setCookie(id, val ?? "");
+    if (!isNoCookie) setCookie(id, val ?? "");
     inputs[id] = val;
   });
   return inputs;

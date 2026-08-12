@@ -274,7 +274,7 @@ main.fit {
 #condition-row {
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: 50px 80px 1fr;
+  grid-template-columns: 50px 80px 30px 1fr;
   height: 38px;
   width: 100%;
   font-weight: bold;
@@ -325,8 +325,15 @@ main.fit {
 #condition-eqptype-text {
   color: #333;
 }
+#condition-isboss-text {
+  color: #333;
+}
 #export-button {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   background: var(--red);
   border: 0;
   border-radius: 5px;
@@ -346,6 +353,26 @@ main.fit {
   position: absolute;
   z-index: -1;
 }
+#condition-exported {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 7.5px;
+}
+#condition-exported.is-exported::before {
+  content: "✓";
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--red);
+  border-radius: 50%;
+  color: var(--red);
+  font-weight: bold;
+  font-size: 9px;
+  text-align: center;
+  padding-left: 1px;
+  padding-top: 1px;
+}
+
 
 #export-numinput {
   align-self: center;
