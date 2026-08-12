@@ -401,9 +401,11 @@ main.fit {
   background: #f9f9f9;
   color: #555;
   font-weight: bold;
+  font-size: 14px;
   border: 2px #555 solid;
   border-radius: 5px;
   padding: 0px 6px;
+  user-select: none;
 }
 #align-panesdiv {
   cursor: pointer;
