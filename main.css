@@ -402,6 +402,7 @@ main.fit {
   cursor: pointer;
   background: #f9f9f9;
   color: #555;
+  font-size: 14px;
   font-weight: bold;
   border: 2px #555 solid;
   border-radius: 5px;
