@@ -614,3 +614,32 @@ main.fit {
   font-size: 12px;
   color: darkred;
 }
+
+.pane-context-menu {
+  position: fixed;
+  z-index: 400;
+  min-width: 148px;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  font-size: 14px;
+  color: #333;
+}
+.pane-context-menu[hidden] {
+  display: none;
+}
+.pane-context-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.pane-context-menu-item:hover,
+.pane-context-menu-item:active {
+  background: #fff0f0;
+}

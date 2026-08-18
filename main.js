@@ -372,6 +372,8 @@ function initializeUI(){
     });
     els.headerrow.addEventListener("input", onHeaderRowInputChange);
     els.headerrow.addEventListener("change", onHeaderRowInputChange);
+    PaneContextMenu.init();
+    els.pane.bodys.forEach(body => PaneContextMenu.bind(body));
   }
 
   {// 初期値の反映
@@ -412,6 +414,127 @@ document.addEventListener("click", ()=>{
     exportPane(+active.dataset.paneIndex);
   }
 });
+
+class PaneContextMenu {
+  static _menu = null;
+  static _item = null;
+  static _targetBody = null;
+  static _openedAt = 0;
+
+  static init() {
+    if (this._menu) return;
+    const menu = document.createElement("div");
+    menu.className = "pane-context-menu";
+    menu.hidden = true;
+    const item = document.createElement("div");
+    item.className = "pane-context-menu-item";
+    item.textContent = "表をコピー";
+    menu.appendChild(item);
+    document.body.appendChild(menu);
+    this._menu = menu;
+    this._item = item;
+
+    item.addEventListener("click", e => {
+      e.stopPropagation();
+      if (Date.now() - this._openedAt < 400) return;
+      this.copyTarget();
+    });
+    menu.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.addEventListener("pointerdown", e => {
+      if (Date.now() - this._openedAt < 200) return;
+      if (!menu.hidden && !menu.contains(e.target)) this.hide();
+    });
+    window.addEventListener("scroll", () => this.hide(), true);
+    window.addEventListener("resize", () => this.hide());
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") this.hide();
+    });
+  }
+
+  static bind(body) {
+    const LONG_MS = 600;
+    const MOVE_PX = 12;
+    let timer = null;
+    let startX = 0;
+    let startY = 0;
+
+    const clearTimer = () => {
+      if (timer == null) return;
+      clearTimeout(timer);
+      timer = null;
+    };
+
+    body.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse") return; // マウスは contextmenu で開く
+      startX = e.clientX;
+      startY = e.clientY;
+      clearTimer();
+      timer = setTimeout(() => {
+        timer = null;
+        this.show(startX, startY, body, true);
+      }, LONG_MS);
+    });
+    body.addEventListener("pointermove", e => {
+      if (timer == null) return;
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > MOVE_PX) clearTimer();
+    });
+    body.addEventListener("pointerup", clearTimer);
+    body.addEventListener("pointercancel", clearTimer);
+    body.addEventListener("contextmenu", e => {
+      e.preventDefault();
+      clearTimer();
+      this.show(e.clientX, e.clientY, body, false);
+    });
+  }
+
+  static show(x, y, body, fromLongPress) {
+    if (!this._menu.hidden && Date.now() - this._openedAt < 400) return;
+    PullDownControl.hideActivePulldown();
+    const bodyIdx = els.pane.bodys.indexOf(body);
+    this._targetBody = body;
+    this._item.textContent = `表${["(左)", "(右)"][bodyIdx] ?? ""}をコピー`;
+    const menu = this._menu;
+    menu.hidden = false;
+
+    const pad = 8;
+    const w = menu.offsetWidth;
+    const h = menu.offsetHeight;
+    let left = x;
+    let top = fromLongPress ? y - h - 16 : y;
+    if (top < pad) top = y + 24;
+    if (left + w > window.innerWidth - pad) left = window.innerWidth - w - pad;
+    if (top + h > window.innerHeight - pad) top = window.innerHeight - h - pad;
+    if (left < pad) left = pad;
+    if (top < pad) top = pad;
+    menu.style.left = left + "px";
+    menu.style.top = top + "px";
+    this._openedAt = Date.now();
+  }
+
+  static hide() {
+    if (!this._menu || this._menu.hidden) return;
+    this._menu.hidden = true;
+    this._targetBody = null;
+  }
+
+  static async copyTarget() {
+    const body = this._targetBody;
+    if (!body) return;
+    let text = "";
+    [...body.children].forEach((cell, i) => {
+      text += cell.textContent.trim();
+      text += cell.classList.contains("prob") ? "\n" : "\t";
+    });
+    try {
+      await navigator.clipboard.writeText(text);
+      this._item.textContent = "コピーしました";
+      setTimeout(() => this.hide(), 450);
+    } catch {
+      this._item.textContent = "コピーに失敗";
+    }
+  }
+}
 
 
 function update(){
@@ -691,6 +814,7 @@ function updatePaneAlignment(animate){
 
     let panecount = 0;
     let emptycount = 0;
+    let isInheritRowAlt = false;
     for (let row of mergedRows){
       if (panedata.length <= panecount) break; // 終端以降はemptyを挿入しない
       const entry = row[paneIdx];
@@ -700,12 +824,17 @@ function updatePaneAlignment(animate){
         entry.prob.style.gridRow = "";
         fragment.appendChild(entry.score);
         fragment.appendChild(entry.prob);
+        isInheritRowAlt = entry.score.classList.contains("row-alt");
       }else{
         emptycount++;
         const scoreEmpty = document.createElement("div");
         scoreEmpty.className = "pane-cell score empty";
         const probEmpty = document.createElement("div");
         probEmpty.className = "pane-cell prob empty";
+        if (isInheritRowAlt){
+          scoreEmpty.classList.add("row-alt");
+          probEmpty.classList.add("row-alt");
+        }
         fragment.appendChild(scoreEmpty);
         fragment.appendChild(probEmpty);
       }
