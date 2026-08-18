@@ -263,11 +263,14 @@ function getProbMap(topnumMap, mode, itemnum){
   const bottomnum = ( n => n*(n-1)*(n-2)*(n-3) )(optionNums) * 100 * 100**4;
   
   const {one, zero} = Decimal;
-  const [, mode1, mode2] = /^(num|prob)(.+)$/.exec(mode) ?? [];
+  const isNumExport = /^num/.test(mode);
+  const isProbExport = /^prob/.test(mode);
+  const isTruncExport = "truncated" === mode;
   let func;
   let e50 = new Decimal(2).ln();
   let e05 = new Decimal(20).ln();
-  if (mode1 == "num"){
+  if (isNumExport){
+    const mode2 = (/^num(.+)$/.exec(mode) ?? [])[1];
     if (mode2 == "avg"){
       func = (t, b) => Decimal(b).div(t);
     } else {
@@ -281,10 +284,34 @@ function getProbMap(topnumMap, mode, itemnum){
         func = (t, b) => e05.times(commonfunc(t, b)); break;
       }
     }
-  } else if (mode1 == "prob"){
+  } else if (isProbExport){
+    const mode2 = (/^prob(.+)$/.exec(mode) ?? [])[1];
     func = (t, b) => {
       let a = Decimal(b-t).div(b).pow(itemnum);
       return one.minus( a ).times( +mode2 );
+    }
+  } else if (isTruncExport){
+    let threthold = Math.ceil(itemnum);
+    // 簡易取得（スコアが存在するなら走査せず直接取得）
+    let borderTop = topnumMap.get(""+threthold) ?? topnumMap.get(threthold) ?? null;
+    // 簡易取得に失敗した場合は走査する。武器転生にも対応
+    if (borderTop === null){
+      const entries = [...topnumMap.entries()];
+      let borderScore = -1;
+      for (const entry of entries){
+        const score = +/\d+$/.exec(entry[0]);
+        const top = entry[1];
+        // 武器転生は最低rankのみを切り捨て候補にする
+        if (borderTop !== null && score <= borderScore) break;
+        borderScore = score;
+        borderTop = top; // 最大値を超える場合は最大値を取得
+        if (threthold <= score) break;
+      }
+    }
+    func = (t, b) => {
+      b = borderTop  ?? b;
+      if (t >= b) return one.times(100);
+      return Decimal(t).div(b).times(100);
     }
   }
 

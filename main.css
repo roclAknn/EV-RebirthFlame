@@ -377,7 +377,8 @@ main.fit {
 }
 
 
-#export-numinput {
+#export-numinput,
+#export-truncinput {
   align-self: center;
   padding: 0 6px;
   height: 30px;
@@ -387,7 +388,8 @@ main.fit {
   border-radius: 5px;
   text-align: right;
 }
-#export-numinput:disabled {
+#export-numinput:disabled,
+#export-truncinput:disabled {
   display: none;
 }
 #export-typediv {
@@ -401,7 +403,6 @@ main.fit {
   background: #f9f9f9;
   color: #555;
   font-weight: bold;
-  font-size: 14px;
   border: 2px #555 solid;
   border-radius: 5px;
   padding: 0px 6px;

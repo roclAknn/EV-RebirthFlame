@@ -78,6 +78,7 @@ function initializeUI(){
     export: {
       export: document.querySelector("#export-button"),
       numinput: document.querySelector("#export-numinput"),
+      truncinput: document.querySelector("#export-truncinput"),
       typediv: document.querySelector("#export-typediv"),
       type: document.querySelector("#export-type"),
     },
@@ -339,7 +340,8 @@ function initializeUI(){
     els.export.export.addEventListener("click", ()=>{
       exportAllPane();
     });
-    els.export.numinput.oninput = ()=>{
+    els.export.numinput.oninput = 
+    els.export.truncinput.oninput = ()=>{
       buildPaneBody(0);
       buildPaneBody(1);
     };
@@ -429,7 +431,8 @@ function update(){
     const exporttype = els.export.type;
     const selopt = exporttype.selectedOptions[0];
     els.export.typediv.textContent = selopt.label;
-    els.export.numinput.disabled = !( "prob" === selopt.value.slice(0, 4) );
+    els.export.numinput.disabled = !/^prob/.test(selopt.value);
+    els.export.truncinput.disabled = "truncated" !== selopt.value;
   }
   {
     const mode = els.alignpanes.value;
@@ -531,7 +534,9 @@ const PANE_ROW_HEIGHT = 25;
 
 function buildMergedRows(panes, issimpleatk, mode, exporttype){
   const isScoreMode = mode === "score";
+  const isNumExport = /^num/.test(exporttype);
   const isProbExport = /^prob/.test(exporttype);
+  const isTruncExport = exporttype === "truncated";
   if (isScoreMode){
     const scoreMap = new Map();
     panes.forEach((panedata, paneIdx) => {
@@ -567,10 +572,10 @@ function buildMergedRows(panes, issimpleatk, mode, exporttype){
       } else {
         // 期待値は昇順、確率は降順
         let diff = prob0.minus(prob1).abs();
-        if (!isProbExport){
+        if (isNumExport){
           res = prob0.lte(prob1) ? -1 : 1;
           if ( (res < 0 ? prob0 : prob1).div(100).gte(diff)) res = 0; // 差が小さければ同値扱い
-        } else {
+        } else if(isProbExport || isTruncExport) {
           res = prob0.gte(prob1) ? -1 : 1;
           if ( (res < 0 ? prob1 : prob0).div(100).gte(diff)) res = 0; // 差が小さければ同値扱い
         }
@@ -778,6 +783,8 @@ function exportAllPane(){
   els.condition.eqptype.style.backgroundImage = `url("./images/${typename}.png")`;
   els.condition.eqptypeText.textContent = typename;
   els.condition.isbossText.textContent = isboss ?  "ボス" : "一般";
+  els.export.truncinput.value = exportData.input.min;
+  els.export.truncinput.min = exportData.input.min;
 
   exportPane(0);
   exportPane(1);
@@ -807,8 +814,18 @@ function exportPane(idx){
 function buildPaneBody(idx){
   const topnumMap = exportData.topnumMaps?.[idx];
   if (!topnumMap) return;
-  const itemnum = Math.max(1, getValue(els.export.numinput) ?? 1);
   const exporttype = getValue(els.export.type);
+  const isNumExport = /^num/.test(exporttype);
+  const isProbExport = /^prob/.test(exporttype);
+  const isTruncExport = "truncated" === exporttype;
+  let itemnum = 0;
+  if (isProbExport) itemnum = Math.max(1, getValue(els.export.numinput) ?? 1);
+  else if (isTruncExport){
+    itemnum = Math.max(
+        getValue(els.export.truncinput) ?? 0
+      , +els.export.truncinput.min ?? 0
+    ); 
+  }
   const probMap = getProbMap(exportData.topnumMaps?.[idx], exporttype, itemnum);
   const body = els.pane.bodys[idx];
   body.replaceChildren();
@@ -823,7 +840,8 @@ function buildPaneBody(idx){
   const probHeader = document.createElement("div");
   probHeader.className = "pane-cell coltitle prob";
   let modeText = 出力タイプ名テキスト[exporttype];
-  if ( /^prob/.test(exporttype) ) modeText = itemnum + modeText;
+  if ( isProbExport ) modeText = itemnum + modeText;
+  else if( isTruncExport ) modeText = itemnum + modeText;
   probHeader.textContent = modeText;
   fragment.appendChild(probHeader);
 

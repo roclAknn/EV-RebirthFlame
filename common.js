@@ -286,6 +286,7 @@ const combinations = [
 const 出力タイプ名リスト = [
   "numavg", "num50", "num95",
   "prob1", "prob100", "prob10000",
+  "truncated",
 ];
 
 const 出力タイプ名テキスト = {
@@ -295,6 +296,7 @@ const 出力タイプ名テキスト = {
   "prob1": "個で出る確率[x1]",
   "prob100": "個で出る確率[x100]",
   "prob10000": "個で出る確率[x10000]",
+  "truncated": "点以上での割合[%]",
 };
 
 function getAtkTensei(lv, rank, isboss){
