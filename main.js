@@ -506,28 +506,27 @@ function buildInfoModalSections(paneIdx){
   {
     const probdata = isBoss ? [0, 0, 0, 0, 100]
                           : ( [...転生確率[tenseiKey]?.列数] ?? [0, 0, 0, 0, 0] );
-    const titleArr = probdata.map( (p, i) => i == 0 ? "" : i + "つ");
-    const probArr = probdata.map( (p, i) => i == 0 ? "確率" : p + "%");
+    probdata.shift();
+    const titleArr = probdata.map( (p, i) => (i + 1) + "つ");
+    const probArr = probdata.map( p =>  p + "%");
     sections.push(appendInfoSection("オプション数 抽選率",
         createInfoTable( titleArr, probArr )
     ));
   }
   {
     const probdata = [...転生確率[tenseiKey]?.ランク] ?? [0, 0, 0, 0, 0];
-    probdata.unshift("");
-    const titleArr = probdata.map( (p, i) => i == 0 ? "" : "R" + (i + isBoss*2));
-    const probArr = probdata.map( (p, i) => i == 0 ? "確率" : p + "%");
+    const titleArr = probdata.map( (p, i) => "R" + (i + 1 + isBoss*2));
+    const probArr = probdata.map( p => p + "%");
     sections.push(appendInfoSection("ランク (Tier) 抽選率",
       createInfoTable( titleArr, probArr )
     ));
   }
 
-  if (!isArmor){
-    const atkRanks = ["", 1, 2, 3, 4, 5];
-    const titleArr = atkRanks.map( (p, i) => i == 0 ? "" : "R" + (i + isBoss*2));
+  if (!isArmor){ 
+    const atkRanks = [1, 2, 3, 4, 5];
+    const titleArr = atkRanks.map( p => "R" + (p + isBoss*2));
     console.log(exportWeaponAtk, weaponAtk);
-    const probArr = atkRanks.map((r, i) => {
-      if (i == 0) return "攻撃/魔力";
+    const probArr = atkRanks.map(r => {
       let val = getAtkTensei(eqplv, r, isBoss);
       return isSimpleAtk ? val.toFixed(1) + "%" : val.div(100).times(weaponAtk).dp(0, BigNumber.ROUND_CEIL).toFixed();
     });

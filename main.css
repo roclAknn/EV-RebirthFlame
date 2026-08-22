@@ -518,7 +518,7 @@ main.fit {
   gap: 12px;
 }
 .info-modal-section-title {
-  margin: 0 0 4px;
+  margin: 0 0 4px 4px;
   font-size: 12px;
   font-weight: bold;
   color: #666;
@@ -535,7 +535,7 @@ main.fit {
   grid-template-columns: 1fr 1fr;
 }
 .info-grid-horizontal {
-  grid-template-columns: minmax(80px, max-content) repeat(calc(var(--info-cols) - 1), 1fr);
+  grid-template-columns: repeat( var(--info-cols), 1fr);
 }
 .info-cell {
   background: #fff;
@@ -556,9 +556,6 @@ main.fit {
 .info-grid-vertical .info-cell-title,
 .info-grid-vertical .info-cell-value {
   text-align: left;
-}
-.info-grid-horizontal .info-cell-title {
-  text-align: center;
 }
 .tensei-container,
 .eqplv-container {

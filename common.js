@@ -362,7 +362,7 @@ function createInfoTable(headers, info, vertical = false){
     });
   } else {
     headers.forEach(header => appendCell(header, "info-cell-head"));
-    info.forEach((val, i) => appendCell(val, i === 0 ? "info-cell-title" : ""));
+    info.forEach((val, i) => appendCell(val, ""));
   }
   return grid;
 }
