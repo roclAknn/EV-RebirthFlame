@@ -506,9 +506,9 @@ function buildInfoModalSections(paneIdx){
   {
     const probdata = isBoss ? [0, 0, 0, 0, 100]
                           : ( [...転生確率[tenseiKey]?.列数] ?? [0, 0, 0, 0, 0] );
-    const titleArr = probdata.map( (p, i) => i == 0 ? "" : i + "列");
+    const titleArr = probdata.map( (p, i) => i == 0 ? "" : i + "つ");
     const probArr = probdata.map( (p, i) => i == 0 ? "確率" : p + "%");
-    sections.push(appendInfoSection("列数抽選率",
+    sections.push(appendInfoSection("オプション数 抽選率",
         createInfoTable( titleArr, probArr )
     ));
   }
@@ -517,7 +517,7 @@ function buildInfoModalSections(paneIdx){
     probdata.unshift("");
     const titleArr = probdata.map( (p, i) => i == 0 ? "" : "R" + (i + isBoss*2));
     const probArr = probdata.map( (p, i) => i == 0 ? "確率" : p + "%");
-    sections.push(appendInfoSection("ランク抽選率",
+    sections.push(appendInfoSection("ランク (Tier) 抽選率",
       createInfoTable( titleArr, probArr )
     ));
   }
