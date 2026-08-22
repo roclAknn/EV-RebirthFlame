@@ -93,6 +93,7 @@ function initializeUI(){
       eqplvinputs: [],
       bodycontainers: [],
       bodys: [],
+      infoButtons: [],
     }
   });
   els.input.statuses = els.statusinputs;
@@ -256,6 +257,7 @@ function initializeUI(){
           </div>
           <div id="eqplv-container-${idx}" class="eqplv-container">
           </div>
+          <button type="button" class="pane-info-button" aria-label="情報">i</button>
         </div>
         <div class="pane-body-container">
           <div id="pane-body-${idx}" class="pane-body"></div>
@@ -264,8 +266,13 @@ function initializeUI(){
 
       const tenseidiv = column.querySelector(`#tensei-container-${idx}`);
       const eqplvdiv = column.querySelector(`#eqplv-container-${idx}`);
+      const infobtn = column.querySelector(".pane-info-button");
       tenseidiv.addEventListener("click", e => e.stopPropagation() );
       eqplvdiv.addEventListener("click", e => e.stopPropagation() );
+      infobtn.addEventListener("click", e => {
+        e.stopPropagation();
+        InfoModal.show(idx);
+      });
       tenseidiv.append(tenseibtn, tenseisel);
       eqplvdiv.append(eqplvbtn, eqplvsel);
       els.exportrow.appendChild(column);
@@ -276,6 +283,7 @@ function initializeUI(){
       els.pane.eqplvinputs[idx] = eqplvinput;
       els.pane.bodycontainers[idx] = column.querySelector(`.pane-body-container`);
       els.pane.bodys[idx] = column.querySelector(`.pane-body`);
+      els.pane.infoButtons[idx] = infobtn;
     };
   }
   {// スクロールボタンを作成
@@ -373,6 +381,7 @@ function initializeUI(){
     els.headerrow.addEventListener("input", onHeaderRowInputChange);
     els.headerrow.addEventListener("change", onHeaderRowInputChange);
     PaneContextMenu.init();
+    InfoModal.init();
     els.pane.bodys.forEach(body => PaneContextMenu.bind(body));
   }
 
@@ -414,6 +423,121 @@ document.addEventListener("click", ()=>{
     exportPane(+active.dataset.paneIndex);
   }
 });
+
+class InfoModal {
+  static _overlay = null;
+  static _content = null;
+
+  static init(){
+    if (this._overlay) return;
+    const overlay = document.createElement("div");
+    overlay.className = "info-modal-overlay";
+    overlay.hidden = true;
+    overlay.innerHTML = `
+      <div class="info-modal" role="dialog" aria-modal="true" aria-label="転生情報">
+        <button type="button" class="info-modal-close" aria-label="閉じる">&times;</button>
+        <div class="info-modal-content"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    this._overlay = overlay;
+    this._content = overlay.querySelector(".info-modal-content");
+    overlay.querySelector(".info-modal-close").addEventListener("click", () => this.hide());
+    overlay.addEventListener("click", e => {
+      if (e.target === overlay) this.hide();
+    });
+    overlay.querySelector(".info-modal").addEventListener("click", e => e.stopPropagation());
+  }
+
+  static show(paneIdx){
+    this.init();
+    this._content.replaceChildren(...buildInfoModalSections(paneIdx));
+    this._overlay.hidden = false;
+  }
+
+  static hide(){
+    if (!this._overlay) return;
+    this._overlay.hidden = true;
+  }
+}
+
+function appendInfoSection(title, table){
+  const section = document.createElement("section");
+  section.className = "info-modal-section";
+  const heading = document.createElement("h3");
+  heading.className = "info-modal-section-title";
+  heading.textContent = title;
+  section.append(heading, table);
+  return section;
+}
+
+function buildInfoModalSections(paneIdx){
+  const exportIsArmor = exportData.input?.isarmor ?? null;
+  const exportIsBoss = exportData.input?.isboss ?? null;
+  const exportIsSimpleAtk = exportData.input?.issimpleatk ?? null;
+  const exportWeaponAtk = exportData.input?.weaponatk ?? null;
+  const inputIsArmor = getValue(els.input.isarmor);
+  const inputIsBoss = getValue(els.input.isboss);
+  const isArmor = exportIsArmor ?? inputIsArmor;
+  const isBoss = exportIsBoss ?? inputIsBoss;
+  const isSimpleAtk = exportIsSimpleAtk ?? getValue(els.input.issimpleatk);
+  const weaponAtk = exportWeaponAtk ?? getValue(els.input.weaponatk);
+
+  const tenseiKey = els.pane.tenseiinputs[paneIdx].value;
+  const tenseiName = 転生セレクト名リスト[tenseiKey] ?? tenseiKey;
+  let eqplv = getValue(els.pane.eqplvinputs[paneIdx]) ?? 0;
+  eqplv = eqplv < 0 ? 0 : ~~eqplv;
+
+  const sections = [];
+  sections.push(appendInfoSection("設定情報",
+    createInfoTable(
+      ["装備タイプ", "ボスボーナス", "転生方法", "装備レベル"],
+      [
+        ( exportIsArmor === null ? "%s (入力中データ)" : "%s (出力中データ)"
+        ).replace("%s", isArmor ? "防具" : "武器"),
+        ( exportIsBoss === null ? "%s (入力中データ)" : "%s (出力中データ)"
+        ).replace("%s", isBoss ? "ボス" : "一般"),
+        tenseiName,
+        String(eqplv)
+      ],
+      true
+    )
+  ));
+  {
+    const probdata = isBoss ? [0, 0, 0, 0, 100]
+                          : ( [...転生確率[tenseiKey]?.列数] ?? [0, 0, 0, 0, 0] );
+    const titleArr = probdata.map( (p, i) => i == 0 ? "" : i + "列");
+    const probArr = probdata.map( (p, i) => i == 0 ? "確率" : p + "%");
+    sections.push(appendInfoSection("列数抽選率",
+        createInfoTable( titleArr, probArr )
+    ));
+  }
+  {
+    const probdata = [...転生確率[tenseiKey]?.ランク] ?? [0, 0, 0, 0, 0];
+    probdata.unshift("");
+    const titleArr = probdata.map( (p, i) => i == 0 ? "" : "R" + (i + isBoss*2));
+    const probArr = probdata.map( (p, i) => i == 0 ? "確率" : p + "%");
+    sections.push(appendInfoSection("ランク抽選率",
+      createInfoTable( titleArr, probArr )
+    ));
+  }
+
+  if (!isArmor){
+    const atkRanks = ["", 1, 2, 3, 4, 5];
+    const titleArr = atkRanks.map( (p, i) => i == 0 ? "" : "R" + (i + isBoss*2));
+    console.log(exportWeaponAtk, weaponAtk);
+    const probArr = atkRanks.map((r, i) => {
+      if (i == 0) return "攻撃/魔力";
+      let val = getAtkTensei(eqplv, r, isBoss);
+      return isSimpleAtk ? val.toFixed(1) + "%" : val.div(100).times(weaponAtk).dp(0, BigNumber.ROUND_CEIL).toFixed();
+    });
+    sections.push(appendInfoSection(`武器 攻撃/魔力 ( レベル: ${eqplv} / ${isSimpleAtk ? "簡易版": ("武器攻撃力: " + weaponAtk)} )`,
+      createInfoTable( titleArr, probArr )
+    ));
+  }
+
+  return sections;
+}
 
 class PaneContextMenu {
   static _menu = null;

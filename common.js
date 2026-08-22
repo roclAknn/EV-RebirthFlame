@@ -339,3 +339,30 @@ function getCookie(name) {
     return key === name ? decodeURIComponent(val) : r;
   }, null);
 }
+
+/* ---- 情報モーダル用テーブル ------------------------------------------- */
+// 見出し配列・情報配列から表を生成（左端列をタイトル列とする）
+// vertical: true なら各行が [見出し, 値]、false なら見出し行+情報行の横方向表
+function createInfoTable(headers, info, vertical = false){
+  const grid = document.createElement("div");
+  grid.className = "info-grid" + (vertical ? " info-grid-vertical" : " info-grid-horizontal");
+  if (!vertical){
+    grid.style.setProperty("--info-cols", headers.length);
+  }
+  const appendCell = (text, ...classes) => {
+    const cell = document.createElement("div");
+    cell.className = ["info-cell", ...classes].filter(Boolean).join(" ");
+    cell.textContent = text ?? "";
+    grid.appendChild(cell);
+  };
+  if (vertical){
+    headers.forEach((header, i) => {
+      appendCell(header, "info-cell-title");
+      appendCell(info[i], "info-cell-value");
+    });
+  } else {
+    headers.forEach(header => appendCell(header, "info-cell-head"));
+    info.forEach((val, i) => appendCell(val, i === 0 ? "info-cell-title" : ""));
+  }
+  return grid;
+}
