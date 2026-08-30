@@ -323,6 +323,40 @@ function initializeUI(){
       el.value = val;
     }); 
   }
+  {// 装備レベル ドロップダウン
+    const wrapper = document.querySelector("#dropdown-eqplv-wrapper");
+    const button = document.querySelector("#dropdown-eqplv-button");
+    const select = document.querySelector("#dropdown-eqplv-select");
+    const eqplvInput = els.input.eqplv;
+    const syncEqplvDropdownSelection = () => {
+      let eqplv = getValue(eqplvInput) ?? 0;
+      eqplv = eqplv < 0 ? 0 : ~~eqplv;
+      select.querySelector(".selected")?.classList.remove("selected");
+      select.querySelector(`li[data-value="${eqplv}"]`)?.classList.add("selected");
+    };
+    wrapper.addEventListener("click", e => e.stopPropagation());
+    button.addEventListener("click", () => {
+      PullDownControl.showPulldown(button, select);
+    });
+    select.hidden = true;
+    レベルセレクト.forEach(key => {
+      const text = レベルセレクト名リスト[key];
+      const opt = document.createElement("li");
+      opt.textContent = text;
+      opt.dataset.value = key;
+      opt.addEventListener("click", () => {
+        PullDownControl.hideActivePulldown();
+        if (opt.classList.contains("selected")) return;
+        select.querySelector(".selected")?.classList.remove("selected");
+        opt.classList.add("selected");
+        eqplvInput.value = key;
+        eqplvInput.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      select.appendChild(opt);
+    });
+    els.dropdown = { eqplv: { wrapper, button, select, syncEqplvDropdownSelection } };
+    syncEqplvDropdownSelection();
+  }
   /* --------------------------------------------------- */
   {//イベントリスナーの登録
     document.querySelectorAll(".eqptype-button").forEach(btn => {
@@ -340,6 +374,7 @@ function initializeUI(){
       });
     });
     els.input.eqplv.oninput = ()=>{
+      els.dropdown.eqplv.syncEqplvDropdownSelection();
       initSimpleAtk();
     };
     els.opener.addEventListener("click", ()=>{

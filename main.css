@@ -31,7 +31,6 @@ label {
 
 input, select {
   min-width: 40px;
-  max-width: 100px;
   height: 24px;
   padding: 1px 4px;
   background-color: white;
@@ -166,7 +165,6 @@ main.fit {
 /* ---- header-row ----------------------------------------------------*/
 #header-row {
   height: fit-content;
-  overflow: hidden;
   transition: height 0.3s linear;
   gap: 1px;
   background: #ccc;
@@ -184,13 +182,76 @@ main.fit {
 .cell.label {
   justify-content: right;
   padding-left: 12px;
+  padding-right: 4px;
   align-items: center;
 }
 .cell.input {
   justify-content: left;
-  padding-right: 12px;
-  padding-left: 8px;
+  padding-left: 4px;
+  padding-right: 24px;
   align-items: center;
+}
+
+#dropdown-eqplv-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#dropdown-eqplv-button {
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  margin-left: 4px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+}
+
+#dropdown-eqplv-select {
+  z-index: 100;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 2px);
+  border: 1px solid gray;
+  border-radius: 5px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  padding-right: 10px;
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 14px;
+  min-width: 72px;
+  width: max-content;
+}
+
+#dropdown-eqplv-select li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#dropdown-eqplv-select li:hover {
+  /*background: var(--pink);*/
+  background: rgba(0, 0, 0, 0.1);
+}
+
+#dropdown-eqplv-select li.selected::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  border-left: 2px solid var(--red);
+  height: 1.2em;
 }
 .cell.join {
   grid-column: span 2;
@@ -204,7 +265,7 @@ main.fit {
 
 #main-column {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: 48px repeat(5, 38px);
   background: var(--pink);
   font-weight: bold;
@@ -263,10 +324,10 @@ main.fit {
 #status-table {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 55px 1fr 55px; /* 横に4列 */
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 横に4列 */
   grid-template-rows: repeat(4, 38px); /* 縦に4行 */
   font-size: 14px;
-  padding: 8px 8px 8px 0px;
+  padding: 8px 0px 8px 0px;
 }
 
 
@@ -617,7 +678,7 @@ main.fit {
   background: #2e343d;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
   padding: 4px;
-
+  padding-right: 10px;
   list-style: none;
   max-height: 240px;
   overflow-y: auto;
@@ -630,10 +691,10 @@ main.fit {
   width: 100%;
   height: 24px;
   margin-bottom: 4px;
-  padding: 0 6px;
+  padding: 0 10px;
   border: 1px solid #47525a;
   border-radius: 4px;
-  background: #1f2a31;
+  background: #10161f;
   color: #ffffff;
 }
 
@@ -642,7 +703,7 @@ main.fit {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 4px 6px;
+  padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
   height: 32px;
