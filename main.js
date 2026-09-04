@@ -8,6 +8,10 @@ const exportData = {
   topnumMaps: [],
 };
 
+// クッキーへの入出力キャッシュ（クッキー拒否でも動くよう対応）
+const inputData = {
+};
+
 // cookieがない、取得できない場合などの既定値
 const defaultValues = {
   "input-isarmor": "true",
@@ -20,6 +24,61 @@ const defaultValues = {
 
 // クッキー保存する入力値IDリスト
 const cookieTargets = Object.keys(defaultValues);
+
+// 現在DOMの#input-minが属するビットフラグ（isArmor/isBoss/isSimpleAtk）
+let minInputFlags = null;
+
+function getMinFlagBits(isArmor, isBoss, isSimpleAtk){
+  return `${+!!isArmor}${+!!isBoss}${isArmor ? 0 : +!!isSimpleAtk}`;
+}
+
+function getMinInputKey(flags = null){
+  if (flags == null){
+    flags = getMinFlagBits(
+      els.input.isarmor.checked,
+      els.input.isboss.checked,
+      els.input.issimpleatk.checked
+    );
+  }
+  return `input-min-${flags}`;
+}
+
+function getMinInputValue(flags = null){
+  const key = getMinInputKey(flags);
+  return inputData[key] ?? inputData["input-min"] ?? defaultValues["input-min"] ?? "";
+}
+
+// ページロード時のみ: input- で始まる既存cookieをinputDataへ一括読込
+function loadInputCookiesToData(){
+  const raw = document.cookie;
+  if (!raw) return;
+  raw.split("; ").forEach(v => {
+    const eq = v.indexOf("=");
+    if (eq < 0) return;
+    const key = v.slice(0, eq);
+    if (!/^input-/.test(key)) return;
+    inputData[key] = decodeURIComponent(v.slice(eq + 1));
+  });
+}
+
+// フラグ変更時: 旧キーへ退避し、新キーの値をDOMへ反映
+function syncMinInputForFlags(){
+  const newFlags = getMinFlagBits(
+    els.input.isarmor.checked,
+    els.input.isboss.checked,
+    els.input.issimpleatk.checked
+  );
+  if (minInputFlags === newFlags) return;
+  els.input.min.value = getMinInputValue(newFlags);
+  minInputFlags = newFlags;
+  els.dropdown?.min?.syncSelection();
+}
+
+function syncInputDataToCookies(){
+  Object.entries(inputData).forEach(([id, val]) => {
+    setCookie(id, val ?? "");
+  });
+}
 
 // document.get～のキャッシュ　getterは直接定義
 const els = {
@@ -302,11 +361,13 @@ function initializeUI(){
   }
   /* ------------------------------------------------ */
   {// クッキーから復元（ない場合は初期値）
+    loadInputCookiesToData();
     cookieTargets.forEach( id => {
+      if (id === "input-min") return; // フラグ確定後に反映
       const el = document.getElementById(id);
       if (!el) return;
       // valは文字列
-      const val = getCookie(id) ?? defaultValues[id] ?? null;
+      const val = inputData[id] ?? defaultValues[id] ?? null;
       const tagName = el.tagName.toLocaleLowerCase();
       const type = el.type.toLocaleLowerCase();
       if(tagName === "input"){
@@ -321,41 +382,52 @@ function initializeUI(){
         el.selectedIndex = 0; return;
       }
       el.value = val;
-    }); 
+    });
+    // isArmor/isBoss/isSimpleAtk 確定後に min を反映
+    els.input.min.value = getMinInputValue();
+    minInputFlags = getMinFlagBits(
+      els.input.isarmor.checked,
+      els.input.isboss.checked,
+      els.input.issimpleatk.checked
+    );
   }
-  {// 装備レベル ドロップダウン
-    const wrapper = document.querySelector("#dropdown-eqplv-wrapper");
-    const button = document.querySelector("#dropdown-eqplv-button");
-    const select = document.querySelector("#dropdown-eqplv-select");
-    const eqplvInput = els.input.eqplv;
-    const syncEqplvDropdownSelection = () => {
-      let eqplv = getValue(eqplvInput) ?? 0;
-      eqplv = eqplv < 0 ? 0 : ~~eqplv;
-      select.querySelector(".selected")?.classList.remove("selected");
-      select.querySelector(`li[data-value="${eqplv}"]`)?.classList.add("selected");
-    };
-    wrapper.addEventListener("click", e => e.stopPropagation());
-    button.addEventListener("click", () => {
-      PullDownControl.showPulldown(button, select);
-    });
-    select.hidden = true;
-    レベルセレクト.forEach(key => {
-      const text = レベルセレクト名リスト[key];
-      const opt = document.createElement("li");
-      opt.textContent = text;
-      opt.dataset.value = key;
-      opt.addEventListener("click", () => {
-        PullDownControl.hideActivePulldown();
-        if (opt.classList.contains("selected")) return;
+  {// 装備レベル / 出力の最低値 ドロップダウン
+    const setupInputDropdown = (inputEl, options, nameList) => {
+      const wrapper = inputEl.parentElement.querySelector(".dropdown-input-wrapper");
+      const button = wrapper.querySelector(".dropdown-input-button");
+      const select = wrapper.querySelector(".dropdown-input-select");
+      const syncSelection = () => {
+        let val = getValue(inputEl) ?? 0;
+        val = val < 0 ? 0 : ~~val;
         select.querySelector(".selected")?.classList.remove("selected");
-        opt.classList.add("selected");
-        eqplvInput.value = key;
-        eqplvInput.dispatchEvent(new Event("input", { bubbles: true }));
+        select.querySelector(`li[data-value="${val}"]`)?.classList.add("selected");
+      };
+      wrapper.addEventListener("click", e => e.stopPropagation());
+      button.addEventListener("click", () => {
+        PullDownControl.showPulldown(button, select);
       });
-      select.appendChild(opt);
-    });
-    els.dropdown = { eqplv: { wrapper, button, select, syncEqplvDropdownSelection } };
-    syncEqplvDropdownSelection();
+      select.hidden = true;
+      options.forEach(key => {
+        const opt = document.createElement("li");
+        opt.textContent = nameList[key];
+        opt.dataset.value = key;
+        opt.addEventListener("click", () => {
+          PullDownControl.hideActivePulldown();
+          if (opt.classList.contains("selected")) return;
+          select.querySelector(".selected")?.classList.remove("selected");
+          opt.classList.add("selected");
+          inputEl.value = key;
+          inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        select.appendChild(opt);
+      });
+      syncSelection();
+      return { wrapper, button, select, syncSelection };
+    };
+    els.dropdown = {
+      eqplv: setupInputDropdown(els.input.eqplv, レベルセレクト, レベルセレクト名リスト),
+      min: setupInputDropdown(els.input.min, 最低値セレクト, 最低値セレクト名リスト),
+    };
   }
   /* --------------------------------------------------- */
   {//イベントリスナーの登録
@@ -374,8 +446,11 @@ function initializeUI(){
       });
     });
     els.input.eqplv.oninput = ()=>{
-      els.dropdown.eqplv.syncEqplvDropdownSelection();
+      els.dropdown.eqplv.syncSelection();
       initSimpleAtk();
+    };
+    els.input.min.oninput = ()=>{
+      els.dropdown.min.syncSelection();
     };
     els.opener.addEventListener("click", ()=>{
       els.maindiv.classList.toggle("isclosed");
@@ -696,6 +771,7 @@ class PaneContextMenu {
 
 
 function update(){
+  syncMinInputForFlags();
   updateEquipType();
   
   {
@@ -764,7 +840,7 @@ function updateStatusTable(){
       return;
     }
     const id = `input-${name}`;
-    const inputval = getCookie(id) ?? defaultValues[id] ?? "";
+    const inputval = inputData[id] ?? defaultValues[id] ?? "";
     label.innerHTML = `<label for="${id}">${labelname}</label>`;
     input.innerHTML = `<input value="${inputval}" id="${id}" class="input-status" type="number" step="any">`;
     if (input.oninput) input.oninput(); // 整合性チェック
@@ -807,7 +883,7 @@ function initSimpleAtk(){
 
   simpleatk.appendChild(fragment);
   const id = simpleatk.id;
-  simpleatk.value = getCookie(id) ?? defaultValues[id] ?? 0;
+  simpleatk.value = inputData[id] ?? defaultValues[id] ?? 0;
 }
 
 const PANE_HEADER_HEIGHT = 28;
@@ -1191,8 +1267,23 @@ function getInputsWithSetCookie(mode = "", cookiemode = ""){ // default: すべ�
     const val = getValue(el);
     if ( isOnlyStatus && !isStatus ) return;
     if ( isWithoutStatus && isStatus) return;
-    if (!isNoCookie) setCookie(id, val ?? "");
+    if (!isNoCookie){
+      if (id === "input-min"){
+        // ビットフラグ付きキーへ保存
+        const flags = minInputFlags ?? getMinFlagBits(
+          els.input.isarmor.checked,
+          els.input.isboss.checked,
+          els.input.issimpleatk.checked
+        );
+        inputData[`input-min-${flags}`] = val ?? "";
+        minInputFlags = flags;
+      } else {
+        inputData[id] = val ?? "";
+      }
+    }
     inputs[id] = val;
   });
+  // inputData を cookie へまとめて同期
+  if (!isNoCookie) syncInputDataToCookies();
   return inputs;
 }

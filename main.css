@@ -192,13 +192,13 @@ main.fit {
   align-items: center;
 }
 
-#dropdown-eqplv-wrapper {
+.dropdown-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-#dropdown-eqplv-button {
+.dropdown-input-button {
   width: 26px;
   height: 24px;
   padding: 0;
@@ -211,7 +211,7 @@ main.fit {
   line-height: 1;
 }
 
-#dropdown-eqplv-select {
+.dropdown-input-select {
   z-index: 100;
   position: absolute;
   right: 0;
@@ -230,7 +230,7 @@ main.fit {
   width: max-content;
 }
 
-#dropdown-eqplv-select li {
+.dropdown-input-select li {
   position: relative;
   display: flex;
   align-items: center;
@@ -241,12 +241,12 @@ main.fit {
   white-space: nowrap;
 }
 
-#dropdown-eqplv-select li:hover {
+.dropdown-input-select li:hover {
   /*background: var(--pink);*/
   background: rgba(0, 0, 0, 0.1);
 }
 
-#dropdown-eqplv-select li.selected::before {
+.dropdown-input-select li.selected::before {
   content: "";
   position: absolute;
   left: 1px;
