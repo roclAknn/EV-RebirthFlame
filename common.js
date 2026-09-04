@@ -251,6 +251,11 @@ const レベルセレクト名リスト = Object.fromEntries(
   レベルセレクト.map(lv => [lv, lv])
 );
 
+const 最低値セレクト = [0, 50, 100, 120, 140, 160, 180, 200];
+const 最低値セレクト名リスト = Object.fromEntries(
+  最低値セレクト.map(min => [min, min])
+);
+
 
 /* cookie処理用フォーム名リスト */
 const formnames = [...コモンフォーム名リスト, ...スコアフォーム名リスト.武器, ...スコアフォーム名リスト.防具]
