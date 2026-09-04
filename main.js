@@ -279,7 +279,7 @@ function initializeUI(){
         });
         select.hidden = true;
         レベルセレクト.forEach( (key, optidx) => {
-          const text = レベルセレクト名リスト[key];
+          const text = レベルセレクト名リスト2[key];
           const opt = document.createElement("li");
           opt.innerHTML = `
             ${text}
@@ -425,7 +425,7 @@ function initializeUI(){
       return { wrapper, button, select, syncSelection };
     };
     els.dropdown = {
-      eqplv: setupInputDropdown(els.input.eqplv, レベルセレクト, レベルセレクト名リスト),
+      eqplv: setupInputDropdown(els.input.eqplv, レベルセレクト, レベルセレクト名リスト1),
       min: setupInputDropdown(els.input.min, 最低値セレクト, 最低値セレクト名リスト),
     };
   }
