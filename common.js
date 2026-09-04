@@ -248,12 +248,12 @@ const 転生アイコン名リスト = {
 
 const レベルセレクト = [250, 200, 160, 150, 140, 130, 120, 110, 100, 0];
 const レベルセレクト名リスト = Object.fromEntries(
-  レベルセレクト.map(lv => [lv, lv])
+  レベルセレクト.map(lv => [lv, `Lv.${lv}`])
 );
 
 const 最低値セレクト = [0, 50, 100, 120, 140, 160, 180, 200];
 const 最低値セレクト名リスト = Object.fromEntries(
-  最低値セレクト.map(min => [min, min])
+  最低値セレクト.map(min => [min, `${min} 点`])
 );
 
 
