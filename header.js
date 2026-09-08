@@ -62,6 +62,11 @@ function buildHeader( title, linkEntries ){
       document.getElementById('menu-btn').classList.remove('active');
     }
   });
+  
+  // 縦方向を固定しない
+  document.addEventListener('scroll', () => {
+    header.style.top = `${- window.scrollY}px`;
+  });
 
   // cookieから揃え位置を復元
   let pos = getCookie("align");
@@ -118,7 +123,7 @@ function fitScale(){
   let sc = 1;
   switch (type){
     case "fit":
-      sc = Math.min(1, main.clientWidth / content.scrollWidth);
+      sc = Math.min(1, window.innerWidth / content.scrollWidth);
       resizeObserver.observe(main);
       resizeObserver.observe(content);
       break;
