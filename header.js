@@ -8,11 +8,15 @@ const resizeObserver = new ResizeObserver(entries => {
 function buildHeader( title, linkEntries ){
   const parent = document.body;
 
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.type = 'text/css';
-  link.href = "header.css";
-  document.head.appendChild(link);
+  const isCssLoaded = [...document.querySelectorAll('link[rel="stylesheet"]')]
+                     .some(link => link.href.includes('header.css'));
+  if (!isCssLoaded){
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = "header.css";
+    document.head.appendChild(link);
+  }
 
   const getLinksHTML = () => {
     let html = "";
@@ -35,7 +39,7 @@ function buildHeader( title, linkEntries ){
     <h1 class="header-title">${title}</h1>
       
     <div class="header-scalingbtn" onclick="changeFitScaleType()">
-      <div class="icon-btn" title="画面に合わせる">
+      <div class="icon-btn" title="画面幅に合わせて縮小">
         <svg viewBox="0 0 16 16">
           <rect x="0" y="1" width="1" height="14" rx="1"/><rect x="15" y="1" width="1" height="14" rx="1"/>
           <rect x="1" y="8" width="14" height="1" rx="0.5"/><path d="M1 8.5l3-3v6zM15 8.5l-3-3v6z"/>
