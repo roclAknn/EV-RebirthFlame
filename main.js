@@ -92,9 +92,6 @@ function initialize(){
 
   const headerLinkEntries = [
     ["GitHub(使い方)", "https://github.com/roclAknn/EV-RebirthFlame"],
-    ["キューブ計算器", "https://roclaknn.github.io/EV-Cube-Calculator/"],
-    ["ステータス効率計算器", "https://roclaknn.github.io/MapleStory-StatusCalc/"],
-    ["ツールチップ切り取りツール", "https://roclaknn.github.io/tooltip_cropper/"],
   ];
   buildHeader("/MapleStory/ 転生の炎の確率計算器", headerLinkEntries);
 }
